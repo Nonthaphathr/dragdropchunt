@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมลากวางอินทรวิเชียรฉันท์ ๑๑ - ครูนนทพัทธ์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #fdfcf0; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #8B4513; border-radius: 4px; }
+
+        /* Theme Colors */
+        .bg-gold-light { background-color: #fdfcf0; }
+        .bg-brown-main { background-color: #5D4037; }
+        .text-brown-main { color: #5D4037; }
+        .border-gold { border-color: #D4AF37; }
+        .bg-gold { background: linear-gradient(135deg, #D4AF37 0%, #C5A028 100%); }
+        .text-gold { color: #D4AF37; }
+
+        /* Game Box Styles */
+        .drop-zone {
+            transition: all 0.3s ease;
+            min-height: 50px;
+            position: relative;
+        }
+        .drop-zone.hovered {
+            background-color: #ffe0b2;
+            border-color: #ff9800;
+            transform: scale(1.05);
+        }
+        .drop-zone.filled {
+            background-color: #fff8e1;
+            border-style: solid;
+        }
+        
+        /* Draggable Item */
+        .word-card {
+            cursor: grab;
+            touch-action: none; /* Prevent scroll on drag */
+            user-select: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .word-card:active { cursor: grabbing; transform: scale(1.1); }
+        .word-card.selected {
+            ring: 4px solid #D4AF37;
+            background-color: #fff3cd;
+            transform: scale(1.1);
+        }
+
+        /* SVG Overlay for Rhymes */
+        #svg-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-x-hidden">
+
+    <div class="fixed inset-0 z-[-1] opacity-10 pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/thai.png');"></div>
+
+    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border-4 border-gold overflow-hidden relative z-10">
+        
+        <header class="bg-brown-main text-white p-6 text-center shadow-md relative">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gold"></div>
+            <h1 class="text-2xl md:text-3xl font-bold mb-2 text-gold">เกมลากและวางสร้างอินทรวิเชียรฉันท์ ๑๑</h1>
+            <p class="text-sm opacity-90">พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง</p>
+        </header>
+
+        <div id="page-register" class="p-8 fade-in">
+            <h2 class="text-2xl font-bold text-brown-main mb-6 text-center border-b-2 border-gold pb-2 inline-block">ลงทะเบียนเข้าสู่บทเรียน</h2>
+            <form id="regis-form" onsubmit="startGame(event)" class="max-w-md mx-auto space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 mb-1">คำนำหน้า</label>
+                        <select id="prefix" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none" required>
+                            <option value="">เลือก...</option>
+                            <option value="ด.ช.">ด.ช.</option>
+                            <option value="ด.ญ.">ด.ญ.</option>
+                            <option value="นาย">นาย</option>
+                            <option value="นางสาว">นางสาว</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-1">ระดับชั้น</label>
+                        <select id="class-level" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none" required>
+                            <option value="">เลือก...</option>
+                            <option value="ม.1">ม.1</option>
+                            <option value="ม.2">ม.2</option>
+                            <option value="ม.3">ม.3</option>
+                            <option value="ม.4">ม.4</option>
+                            <option value="ม.5">ม.5</option>
+                            <option value="ม.6">ม.6</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-1">ชื่อจริง</label>
+                    <input type="text" id="firstname" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none" placeholder="ไม่ต้องใส่คำนำหน้า" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-1">นามสกุล</label>
+                    <input type="text" id="lastname" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-1">เลขที่</label>
+                    <input type="number" id="number" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none" min="1" required>
+                </div>
+                <button type="submit" class="w-full bg-gold text-brown-main font-bold py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition duration-200 mt-4 text-lg">
+                    เริ่มเล่นเกม 🎮
+                </button>
+            </form>
+        </div>
+
+        <div id="page-game" class="hidden relative">
+            <div class="flex justify-between items-center bg-yellow-50 p-4 border-b border-gray-200">
+                <div class="font-bold text-brown-main">
+                    <span id="player-name-display">ผู้เล่น: ...</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-gray-600">⏱️ เวลา:</span>
+                    <span id="timer" class="font-mono font-bold text-xl text-red-600">00:00</span>
+                </div>
+            </div>
+
+            <div class="p-4 md:p-6 relative">
+                <svg id="svg-lines"></svg>
+
+                <h3 class="text-xl font-bold text-center text-brown-main mb-2">ข้อที่ 1 : จงเรียงคำให้ถูกต้องตามฉันทลักษณ์</h3>
+                <p class="text-center text-gray-500 text-sm mb-6">"คลิกที่คำ" แล้วนำไป "คลิกที่ช่องว่าง" หรือลากไปวาง</p>
+
+                <div class="bg-white p-4 rounded-xl border-2 border-dashed border-gray-300 relative z-10 max-w-3xl mx-auto" id="poem-container">
+                    
+                    <div class="flex flex-wrap justify-center gap-2 mb-8 verse-row">
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="ควร" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="สุด" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="จะ" data-type="ลหุ"></div><div class="text-xs text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="สม" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" id="slot-1-5" data-target="เพช" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ (ส่ง)</div></div>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-2 mb-8 verse-row">
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="จิ" data-type="ลหุ"></div><div class="text-xs text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="ตระ" data-type="ลหุ"></div><div class="text-xs text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" id="slot-2-3" data-target="เวท" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ (รับ)</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="ท" data-type="ลหุ"></div><div class="text-xs text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="นา" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" id="slot-2-6" data-target="การ" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ (ส่ง)</div></div>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-2 mb-8 verse-row">
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="ที่" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="ท่าน" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="พฤ" data-type="ลหุ"></div><div class="text-xs text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="ฒา" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" id="slot-3-5" data-target="จารย์" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ (รับ)</div></div>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-2 mb-2 verse-row">
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="พะ" data-type="ลหุ"></div><div class="text-xs text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="กระ" data-type="ลหุ"></div><div class="text-xs text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="ทบ" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="ประ" data-type="ลหุ"></div><div class="text-xs text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="สบ" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
+                        <div class="verse-group"><div class="drop-zone w-16 h-12 md:w-20 md:h-14 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center" data-target="ทัณฑ์" data-type="ครุ"></div><div class="text-xs text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
+                    </div>
+
+                </div>
+
+                <div class="mt-8">
+                    <h4 class="text-center font-bold text-gray-700 mb-3">คลังคำศัพท์ (ลาก หรือ คลิก)</h4>
+                    <div id="word-bank" class="flex flex-wrap justify-center gap-3 p-4 bg-yellow-100 rounded-xl min-h-[100px]">
+                        </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button onclick="checkAnswer()" class="bg-brown-main text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-yellow-800 transition transform hover:scale-105">
+                        ✅ ตรวจคำตอบ
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-result" class="hidden p-8 text-center fade-in">
+            <div class="mb-6">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYzRkYjJkYjJkYjJkYjJkYjJkYjJkYjJkYjJkYjJkYjJk/l0HlHFRbmaX9obqE8/giphy.gif" alt="Success" class="w-32 h-32 mx-auto rounded-full shadow-xl hidden" id="success-img">
+                </div>
+            
+            <h2 class="text-3xl font-bold text-brown-main mb-2">สรุปผลคะแนน</h2>
+            <p id="result-name" class="text-gray-600 mb-6">คุณ...</p>
+
+            <div class="bg-yellow-50 p-6 rounded-xl border border-gold mb-6 inline-block w-full max-w-sm">
+                <div class="text-5xl font-bold text-gold mb-2" id="final-score">0</div>
+                <div class="text-gray-500">คะแนนรวม</div>
+            </div>
+
+            <div class="text-left bg-white p-4 rounded-lg shadow-inner mb-6 text-sm md:text-base">
+                <p><strong>📊 ผลการวิเคราะห์:</strong> <span id="analysis-text" class="text-brown-main">...</span></p>
+                <p class="mt-2"><strong>💡 ข้อเสนอแนะ:</strong> <span id="suggestion-text" class="text-gray-600">...</span></p>
+            </div>
+
+            <button onclick="location.reload()" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300">
+                🔄 เล่นใหม่อีกครั้ง
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3ek50qmc39njmYK0HRiWq_GXpclneLZdhW5FR-iLbdjWuieHbVrMO0BHnq78d8KQHNQ/exec'; // *** ใส่ URL ของคุณที่นี่ ***
+
+        // --- Game State ---
+        let gameState = {
+            player: {},
+            startTime: 0,
+            timerInterval: null,
+            elapsedSeconds: 0,
+            selectedWord: null, // For tap-to-select logic
+            level1Words: [
+                "ควร", "สุด", "จะ", "สม", "เพช",
+                "จิ", "ตระ", "เวท", "ท", "นา", "การ",
+                "ที่", "ท่าน", "พฤ", "ฒา", "จารย์",
+                "พะ", "กระ", "ทบ", "ประ", "สบ", "ทัณฑ์"
+            ]
+        };
+
+        // --- Initialization ---
+        function startGame(e) {
+            e.preventDefault();
+            
+            // Get Player Info
+            gameState.player = {
+                prefix: document.getElementById('prefix').value,
+                level: document.getElementById('class-level').value,
+                firstname: document.getElementById('firstname').value,
+                lastname: document.getElementById('lastname').value,
+                number: document.getElementById('number').value
+            };
+
+            // UI Switch
+            document.getElementById('page-register').classList.add('hidden');
+            document.getElementById('page-game').classList.remove('hidden');
+            document.getElementById('player-name-display').innerText = `ผู้เล่น: ${gameState.player.firstname} ${gameState.player.level}`;
+
+            // Setup Game
+            setupLevel1();
+            startTimer();
+            
+            // Draw lines after a slight delay to ensure layout is set
+            setTimeout(drawRhymeLines, 500);
+            window.addEventListener('resize', drawRhymeLines);
+        }
+
+        // --- Timer Logic ---
+        function startTimer() {
+            gameState.startTime = Date.now();
+            gameState.timerInterval = setInterval(() => {
+                gameState.elapsedSeconds = Math.floor((Date.now() - gameState.startTime) / 1000);
+                const minutes = Math.floor(gameState.elapsedSeconds / 60).toString().padStart(2, '0');
+                const seconds = (gameState.elapsedSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('timer').innerText = `${minutes}:${seconds}`;
+            }, 1000);
+        }
+
+        // --- Level Setup ---
+        function setupLevel1() {
+            const wordBank = document.getElementById('word-bank');
+            const shuffledWords = [...gameState.level1Words].sort(() => Math.random() - 0.5);
+
+            shuffledWords.forEach(word => {
+                const el = document.createElement('div');
+                el.className = 'word-card bg-white border border-yellow-400 shadow-md rounded-lg px-4 py-2 font-bold text-brown-main text-lg md:text-xl';
+                el.innerText = word;
+                el.draggable = true;
+                el.id = `word-${word}-${Math.random().toString(36).substr(2, 5)}`; // Unique ID
+                
+                // Drag Events
+                el.addEventListener('dragstart', dragStart);
+                el.addEventListener('dragend', dragEnd);
+                
+                // Click/Touch Events (Hybrid)
+                el.addEventListener('click', () => selectWord(el));
+                
+                wordBank.appendChild(el);
+            });
+
+            // Setup Drop Zones
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', dragOver);
+                zone.addEventListener('dragleave', dragLeave);
+                zone.addEventListener('drop', drop);
+                zone.addEventListener('click', () => placeSelectedWord(zone));
+            });
+        }
+
+        // --- Drag & Drop / Tap Logic ---
+
+        function dragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.id);
+            setTimeout(() => e.target.classList.add('invisible'), 0);
+            selectWord(e.target); // Also trigger selection state visually
+        }
+
+        function dragEnd(e) {
+            e.target.classList.remove('invisible');
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+            e.target.closest('.drop-zone').classList.add('hovered');
+        }
+
+        function dragLeave(e) {
+            e.target.closest('.drop-zone').classList.remove('hovered');
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            const zone = e.target.closest('.drop-zone');
+            zone.classList.remove('hovered');
+            
+            const id = e.dataTransfer.getData('text/plain');
+            const draggable = document.getElementById(id);
+            
+            if (zone && draggable) {
+                moveWordToZone(draggable, zone);
+            }
+        }
+
+        // Hybrid System: Tap to Select -> Tap to Place
+        function selectWord(el) {
+            // Deselect previous
+            if (gameState.selectedWord) {
+                gameState.selectedWord.classList.remove('selected');
+            }
+            
+            // If clicking same word inside bank, deselect
+            if (gameState.selectedWord === el && el.parentElement.id === 'word-bank') {
+                gameState.selectedWord = null;
+                return;
+            }
+
+            // If clicking word inside a drop zone, move it back to bank first (optional, but good UX)
+            if (el.parentElement.classList.contains('drop-zone')) {
+                // Allow re-selecting placed word to move it elsewhere
+                gameState.selectedWord = el;
+                el.classList.add('selected');
+            } else {
+                // Select new word from bank
+                gameState.selectedWord = el;
+                el.classList.add('selected');
+            }
+        }
+
+        function placeSelectedWord(zone) {
+            if (gameState.selectedWord && !zone.hasChildNodes()) {
+                moveWordToZone(gameState.selectedWord, zone);
+                gameState.selectedWord.classList.remove('selected');
+                gameState.selectedWord = null;
+            } else if (zone.hasChildNodes() && gameState.selectedWord) {
+                // Swap logic (Advanced) - For now, simple alert or just ignore
+                // Let's implement simple Swap: Return current to bank, place new
+                const existing = zone.firstElementChild;
+                document.getElementById('word-bank').appendChild(existing);
+                moveWordToZone(gameState.selectedWord, zone);
+                gameState.selectedWord.classList.remove('selected');
+                gameState.selectedWord = null;
+            }
+        }
+
+        function moveWordToZone(item, zone) {
+            zone.innerHTML = ''; // Clear just in case
+            zone.appendChild(item);
+            zone.classList.add('filled');
+            
+            // Play sound (Optional)
+            // const audio = new Audio('pop.mp3'); audio.play();
+        }
+
+        // --- Rhyme Line Drawing (SVG) ---
+        function drawRhymeLines() {
+            const svg = document.getElementById('svg-lines');
+            svg.innerHTML = ''; // Clear old lines
+
+            const connections = [
+                { from: 'slot-1-5', to: 'slot-2-3', color: '#E91E63' }, // วรรค 1 ท้าย -> วรรค 2 คำ 3 (สัมผัสนอก)
+                { from: 'slot-2-6', to: 'slot-3-5', color: '#E91E63' }  // วรรค 2 ท้าย -> วรรค 3 ท้าย (สัมผัสนอก)
+            ];
+
+            connections.forEach(conn => {
+                const el1 = document.getElementById(conn.from);
+                const el2 = document.getElementById(conn.to);
+
+                if (el1 && el2) {
+                    const rect1 = el1.getBoundingClientRect();
+                    const rect2 = el2.getBoundingClientRect();
+                    const containerRect = document.getElementById('poem-container').getBoundingClientRect();
+
+                    // Calculate center points relative to container
+                    // Note: We need coordinates relative to the SVG container (which is relative to parent)
+                    // Simplified: SVG is absolute top-0 left-0 of parent (.p-4.md:p-6)
+                    // Let's use getBoundingClientRect delta
+                    
+                    const parentRect = svg.getBoundingClientRect();
+
+                    const x1 = rect1.left + rect1.width / 2 - parentRect.left;
+                    const y1 = rect1.top + rect1.height / 2 - parentRect.top;
+                    const x2 = rect2.left + rect2.width / 2 - parentRect.left;
+                    const y2 = rect2.top + rect2.height / 2 - parentRect.top;
+
+                    // Draw Bezier Curve
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    const curve = Math.abs(x2 - x1) * 0.5;
+                    // M x1 y1 C (x1+curve) y1, (x2-curve) y2, x2 y2
+                    // Or simple quadratic: Q (x1+x2)/2 (y1+y2)/2 + offset
+                    
+                    // Let's do a nice curve downwards
+                    const d = `M ${x1} ${y1} Q ${(x1 + x2) / 2} ${(y1 + y2) / 2 + 30} ${x2} ${y2}`;
+                    
+                    path.setAttribute("d", d);
+                    path.setAttribute("stroke", conn.color);
+                    path.setAttribute("stroke-width", "3");
+                    path.setAttribute("fill", "none");
+                    path.setAttribute("stroke-dasharray", "5,5"); // Dashed line
+                    path.classList.add('fade-in');
+                    
+                    svg.appendChild(path);
+                    
+                    // Add dot at ends
+                    [ {x:x1, y:y1}, {x:x2, y:y2} ].forEach(pt => {
+                        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                        circle.setAttribute("cx", pt.x);
+                        circle.setAttribute("cy", pt.y);
+                        circle.setAttribute("r", "4");
+                        circle.setAttribute("fill", conn.color);
+                        svg.appendChild(circle);
+                    });
+                }
+            });
+        }
+
+        // --- Grading Logic ---
+        function checkAnswer() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            let correctCount = 0;
+            let total = dropZones.length;
+            let isComplete = true;
+
+            dropZones.forEach(zone => {
+                if (zone.children.length === 0) {
+                    isComplete = false;
+                    zone.classList.add('bg-red-100'); // Highlight empty
+                } else {
+                    const wordEl = zone.children[0];
+                    const placedWord = wordEl.innerText.trim();
+                    const targetWord = zone.dataset.target;
+                    
+                    if (placedWord === targetWord) {
+                        correctCount++;
+                        zone.classList.remove('bg-red-100');
+                        zone.classList.add('bg-green-100', 'border-green-500');
+                    } else {
+                        zone.classList.add('bg-red-100', 'border-red-500');
+                    }
+                }
+            });
+
+            if (!isComplete) {
+                alert("กรุณาวางคำให้ครบทุกช่องก่อนตรวจคำตอบครับ");
+                return;
+            }
+
+            // Stop Timer
+            clearInterval(gameState.timerInterval);
+
+            // Calculate Score
+            // Base score 100. Deduct 1 per 5 seconds elapsed? No, simple logic:
+            // Accuracy Score (Max 80) + Time Bonus (Max 20)
+            const accuracyScore = Math.round((correctCount / total) * 80);
+            const timePenalty = Math.min(20, Math.floor(gameState.elapsedSeconds / 10)); // Lose 1 pt per 10s
+            const timeBonus = Math.max(0, 20 - timePenalty);
+            const finalScore = accuracyScore + timeBonus;
+
+            showResult(finalScore, correctCount, total);
+            
+            // Save to Google Sheet
+            saveToSheet(finalScore);
+        }
+
+        function showResult(score, correct, total) {
+            document.getElementById('page-game').classList.add('hidden');
+            document.getElementById('page-result').classList.remove('hidden');
+            
+            document.getElementById('result-name').innerText = `ผู้เล่น: ${gameState.player.firstname} ${gameState.player.lastname}`;
+            document.getElementById('final-score').innerText = score;
+
+            // Analysis
+            const analysisEl = document.getElementById('analysis-text');
+            const suggestEl = document.getElementById('suggestion-text');
+
+            if (score >= 80) {
+                analysisEl.innerText = "ยอดเยี่ยมมาก! มีความเข้าใจฉันทลักษณ์แม่นยำ";
+                suggestEl.innerText = "ลองฝึกแต่งบทประพันธ์ด้วยตัวเองดูนะ!";
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            } else if (score >= 60) {
+                analysisEl.innerText = "ทำได้ดี! แต่อาจมีสับสนตำแหน่งลหุบ้าง";
+                suggestEl.innerText = "ทบทวนเรื่อง ครุ-ลหุ ในวรรคที่ 2 และ 4 อีกนิดครับ";
+            } else {
+                analysisEl.innerText = "พยายามอีกนิด! ยังเรียงคำไม่ตรงตามสัมผัส";
+                suggestEl.innerText = "สังเกตแผนผังฉันทลักษณ์และเส้นโยงสัมผัสให้ดีครับ";
+            }
+        }
+
+        // --- Google Sheet Connection ---
+        function saveToSheet(score) {
+            if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+                console.warn("Google Script URL not set");
+                return;
+            }
+
+            const data = {
+                timestamp: new Date().toISOString(),
+                ...gameState.player,
+                score: score,
+                time: gameState.elapsedSeconds
+            };
+
+            // Use fetch no-cors for simple submission
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(() => {
+                console.log("Score saved successfully");
+            }).catch(err => console.error("Error saving score:", err));
+        }
+
+    </script>
+</body>
+</html>
