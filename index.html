@@ -441,40 +441,39 @@
         // On Load, check if we should show register or game
         window.onload = () => {
              // 📊 VISITOR COUNTER START
-             // แก้ไข Namespace ให้เฉพาะเจาะจงมากขึ้นและไม่ซ้ำ เพื่อรีเซ็ตค่า N/A
-             const NAMESPACE = 'nonthaphathr-indravichian-game-v1'; 
-             const KEY = 'visits';
-             const countEl = document.getElementById('visit-count');
-             const badge = document.getElementById('visitor-badge');
-             
-             fetch(`https://api.counterapi.com/v1/${NAMESPACE}/${KEY}/up`)
-                 .then(response => response.json())
-                 .then(data => {
-                     // Animation ตัวเลข
-                     const start = 0;
-                     const end = data.count;
-                     const duration = 2000;
-                     let startTimestamp = null;
-                     const step = (timestamp) => {
-                        if (!startTimestamp) startTimestamp = timestamp;
-                        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                        countEl.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
-                        if (progress < 1) {
-                            window.requestAnimationFrame(step);
-                        }
-                     };
-                     window.requestAnimationFrame(step);
-                     
-                     // Show badge smoothly
-                     badge.classList.remove('translate-y-4', 'opacity-0');
-                 })
-                 .catch(err => {
-                     console.error("Counter Error:", err);
-                     // กรณีโหลดไม่ได้ (เช่น AdBlock)
-                     countEl.innerText = "-";
-                     badge.classList.remove('translate-y-4', 'opacity-0');
-                 });
-             // 📊 VISITOR COUNTER END
+const countEl = document.getElementById('visit-count');
+const badge = document.getElementById('visitor-badge');
+
+fetch('https://api.counterapi.dev/v1/nonthaphathr-indravichian-game/visits/up')
+    .then(response => {
+        if (!response.ok) throw new Error('Network response');
+        return response.json();
+    })
+    .then(data => {
+        // Animation ตัวเลข
+        const start = 0;
+        const end = data.count;
+        const duration = 2000;
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            countEl.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('th-TH');
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+        
+        // Show badge smoothly
+        badge.classList.remove('translate-y-4', 'opacity-0');
+    })
+    .catch(err => {
+        console.error("Counter Error:", err);
+        countEl.innerText = "-";
+        badge.classList.remove('translate-y-4', 'opacity-0');
+    });
+// 📊 VISITOR COUNTER END
 
              if(localStorage.getItem(STORAGE_KEY)) {
                  checkResumeGame();
