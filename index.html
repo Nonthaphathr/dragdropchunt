@@ -119,7 +119,7 @@
             pointer-events: none;
         }
 
-        /* SVG Overlay for Rhymes */
+        /* SVG Overlay for Rhymes - INSIDE poem-container only */
         #svg-lines {
             position: absolute;
             top: 0;
@@ -127,7 +127,11 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 0;
+            z-index: 1;
+        }
+        
+        #poem-container {
+            position: relative;
         }
         
         .fade-in { animation: fadeIn 0.5s ease-in; }
@@ -165,7 +169,7 @@
             background: rgba(255, 255, 255, 0.98);
         }
 
-        /* ============ ROULETTE STYLES ============ */
+        /* ============ ROULETTE STYLES - FIXED ============ */
         .roulette-container {
             position: relative;
             width: 260px;
@@ -185,30 +189,29 @@
             height: 100%;
             border-radius: 50%;
             position: relative;
-            overflow: hidden;
             border: 6px solid #5D4037;
             box-shadow: 0 0 20px rgba(0,0,0,0.3);
             transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            /* 4 equal segments using conic-gradient */
+            background: conic-gradient(
+                from 0deg,
+                #3B82F6 0deg 90deg,      /* Blue - ช่วยจัด 3 คำ */
+                #F59E0B 90deg 180deg,    /* Yellow - เปิดเฉลย */
+                #10B981 180deg 270deg,   /* Green - เพิ่มเวลา */
+                #EF4444 270deg 360deg    /* Red - สลับคำ */
+            );
         }
 
-        .roulette-segment {
+        .roulette-icon {
             position: absolute;
-            width: 50%;
-            height: 50%;
-            transform-origin: bottom right;
-            clip-path: polygon(0 0, 100% 0, 100% 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .roulette-segment span {
-            position: absolute;
-            top: 25%;
-            left: 25%;
-            transform: rotate(45deg);
             font-size: 1.8rem;
+            transform: translate(-50%, -50%);
         }
+
+        .roulette-icon-a { top: 30%; left: 70%; }
+        .roulette-icon-b { top: 70%; left: 70%; }
+        .roulette-icon-c { top: 70%; left: 30%; }
+        .roulette-icon-d { top: 30%; left: 30%; }
 
         .roulette-pointer {
             position: absolute;
@@ -345,12 +348,12 @@
             </div>
 
             <div class="p-2 md:p-6 relative flex-grow">
-                <svg id="svg-lines"></svg>
 
                 <h3 class="text-base md:text-xl font-bold text-center text-brown-main mb-1">บทที่ <span id="poem-number">1</span> : จงเรียงคำให้ถูกต้องตามฉันทลักษณ์</h3>
                 <p class="text-center text-gray-500 text-xs mb-3">"คลิกที่คำ" แล้วนำไป "คลิกที่ช่องว่าง" หรือลากไปวาง</p>
 
                 <div class="bg-white p-2 md:p-4 rounded-xl border-2 border-dashed border-gray-300 relative z-10 max-w-4xl mx-auto" id="poem-container">
+                    <svg id="svg-lines"></svg>
                     <!-- Dynamic content will be generated here -->
                 </div>
 
@@ -420,22 +423,11 @@
             <div class="roulette-container">
                 <div class="roulette-pointer"></div>
                 <div class="roulette-wheel" id="roulette-wheel">
-                    <!-- Segment A: ช่วยจัดคำ 3 คำ (Blue) -->
-                    <div class="roulette-segment" style="background: #3B82F6; transform: rotate(0deg);">
-                        <span>🤖</span>
-                    </div>
-                    <!-- Segment B: เปิดเฉลย 1 วินาที (Yellow) -->
-                    <div class="roulette-segment" style="background: #F59E0B; transform: rotate(90deg);">
-                        <span>⚡</span>
-                    </div>
-                    <!-- Segment C: เพิ่มเวลา 30 วินาที (Green) -->
-                    <div class="roulette-segment" style="background: #10B981; transform: rotate(180deg);">
-                        <span>⏰</span>
-                    </div>
-                    <!-- Segment D: สลับตำแหน่ง 3 คำ (Red) -->
-                    <div class="roulette-segment" style="background: #EF4444; transform: rotate(270deg);">
-                        <span>🔀</span>
-                    </div>
+                    <!-- Icons positioned on wheel -->
+                    <span class="roulette-icon roulette-icon-a">🤖</span>
+                    <span class="roulette-icon roulette-icon-b">⚡</span>
+                    <span class="roulette-icon roulette-icon-c">⏰</span>
+                    <span class="roulette-icon roulette-icon-d">🔀</span>
                 </div>
                 <div class="roulette-center">🎲</div>
             </div>
@@ -632,7 +624,10 @@
         // --- Dynamic Poem UI Generation ---
         function setupPoemUI() {
             const container = document.getElementById('poem-container');
+            // Keep SVG element, clear everything else
+            const svg = document.getElementById('svg-lines');
             container.innerHTML = '';
+            container.appendChild(svg);
             
             const poem = gameState.currentPoem;
             gameState.allWords = [];
@@ -1122,6 +1117,7 @@
         // --- Rhyme Line Drawing ---
         function drawRhymeLines() {
             const svg = document.getElementById('svg-lines');
+            if (!svg) return;
             svg.innerHTML = '';
             
             const connections = [
@@ -1130,7 +1126,13 @@
             ];
 
             const container = document.getElementById('poem-container');
+            if (!container) return;
+            
             const containerRect = container.getBoundingClientRect();
+            
+            // Set SVG size to match container
+            svg.style.width = container.offsetWidth + 'px';
+            svg.style.height = container.offsetHeight + 'px';
 
             connections.forEach(conn => {
                 const el1 = document.getElementById(conn.from);
@@ -1140,14 +1142,17 @@
                     const rect1 = el1.getBoundingClientRect();
                     const rect2 = el2.getBoundingClientRect();
 
+                    // Calculate positions relative to container
                     const x1 = rect1.left + rect1.width / 2 - containerRect.left;
                     const y1 = rect1.top + rect1.height / 2 - containerRect.top;
                     const x2 = rect2.left + rect2.width / 2 - containerRect.left;
                     const y2 = rect2.top + rect2.height / 2 - containerRect.top;
 
+                    // Draw curved line
                     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                    const midY = (y1 + y2) / 2 + 25;
-                    const d = `M ${x1} ${y1} Q ${(x1 + x2) / 2 + 30} ${midY} ${x2} ${y2}`;
+                    const controlX = Math.max(x1, x2) + 40;
+                    const controlY = (y1 + y2) / 2;
+                    const d = `M ${x1} ${y1} Q ${controlX} ${controlY} ${x2} ${y2}`;
                     path.setAttribute("d", d);
                     path.setAttribute("stroke", conn.color);
                     path.setAttribute("stroke-width", "2");
@@ -1156,6 +1161,7 @@
                     path.classList.add('fade-in');
                     svg.appendChild(path);
 
+                    // Draw circles at endpoints
                     [{x:x1, y:y1}, {x:x2, y:y2}].forEach(pt => {
                         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                         circle.setAttribute("cx", pt.x);
