@@ -10,29 +10,16 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Audio Elements -->
-    <audio id="sound-start" preload="auto">
-        <source src="https://nonthaphathr.github.io/uploadimg/openlakwang.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="sound-quiz" preload="auto">
-        <source src="https://nonthaphathr.github.io/uploadimg/tuachuay.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="sound-submit" preload="auto">
-        <source src="https://nonthaphathr.github.io/uploadimg/yehwinner.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="sound-replay" preload="auto">
-        <source src="https://nonthaphathr.github.io/uploadimg/replay.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="sound-start" preload="auto"><source src="https://nonthaphathr.github.io/uploadimg/openlakwang.mp3" type="audio/mpeg"></audio>
+    <audio id="sound-quiz" preload="auto"><source src="https://nonthaphathr.github.io/uploadimg/tuachuay.mp3" type="audio/mpeg"></audio>
+    <audio id="sound-submit" preload="auto"><source src="https://nonthaphathr.github.io/uploadimg/yehwinner.mp3" type="audio/mpeg"></audio>
+    <audio id="sound-replay" preload="auto"><source src="https://nonthaphathr.github.io/uploadimg/replay.mp3" type="audio/mpeg"></audio>
 
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #fdfcf0; }
-        
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #8B4513; border-radius: 4px; }
-
-        /* Theme Colors */
         .bg-gold-light { background-color: #fdfcf0; }
         .bg-brown-main { background-color: #5D4037; }
         .text-brown-main { color: #5D4037; }
@@ -40,321 +27,100 @@
         .bg-gold { background: linear-gradient(135deg, #D4AF37 0%, #C5A028 100%); }
         .text-gold { color: #D4AF37; }
 
-        /* ============ MOBILE-FIRST VERSE LAYOUT ============ */
-        .verse-row {
-            display: flex;
-            flex-wrap: nowrap;
-            justify-content: center;
-            gap: 4px;
-            margin-bottom: 1rem;
-            overflow-x: auto;
-            padding: 4px 0;
-        }
-        
-        .verse-group {
-            flex-shrink: 0;
-        }
+        .verse-row { display: flex; flex-wrap: nowrap; justify-content: center; gap: 4px; margin-bottom: 1.5rem; overflow-x: auto; padding: 4px 0; }
+        .verse-group { flex-shrink: 0; position: relative; }
 
-        /* Drop Zone Styles - Smaller on mobile */
         .drop-zone {
-            transition: all 0.3s ease;
-            position: relative;
-            width: 2.8rem;
-            height: 2.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
+            transition: all 0.3s ease; position: relative;
+            width: 2.8rem; height: 2.5rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; z-index: 20; /* Ensure boxes are above lines */
+            background-color: #fff;
         }
         
         @media (min-width: 640px) {
-            .drop-zone {
-                width: 3.5rem;
-                height: 3rem;
-                font-size: 1rem;
-            }
-            .verse-row {
-                gap: 8px;
-            }
+            .drop-zone { width: 3.5rem; height: 3rem; font-size: 1rem; }
+            .verse-row { gap: 12px; margin-bottom: 2rem; }
         }
-        
         @media (min-width: 768px) {
-            .drop-zone {
-                width: 4rem;
-                height: 3.2rem;
-                font-size: 1.1rem;
-            }
+            .drop-zone { width: 4rem; height: 3.2rem; font-size: 1.1rem; }
         }
 
-        .drop-zone.hovered {
-            background-color: #ffe0b2 !important;
-            border-color: #ff9800 !important;
-            transform: scale(1.08);
-        }
-        .drop-zone.filled {
-            background-color: #fff8e1;
-            border-style: solid;
-        }
+        .drop-zone.hovered { background-color: #ffe0b2 !important; border-color: #ff9800 !important; transform: scale(1.08); }
+        .drop-zone.filled { background-color: #fff8e1; border-style: solid; }
         
-        /* Draggable Item */
         .word-card {
-            cursor: grab;
-            touch-action: none;
-            user-select: none;
+            cursor: grab; touch-action: none; user-select: none;
             transition: transform 0.2s, box-shadow 0.2s;
-            font-size: 0.9rem;
-            padding: 6px 10px;
-            z-index: 10;
+            font-size: 0.9rem; padding: 6px 10px; z-index: 30;
         }
-        
-        @media (min-width: 640px) {
-            .word-card { 
-                font-size: 1rem; 
-                padding: 8px 14px;
-            }
-        }
-        
-        @media (min-width: 768px) {
-            .word-card { 
-                font-size: 1.125rem; 
-                padding: 8px 16px;
-            }
-        }
-
+        @media (min-width: 640px) { .word-card { font-size: 1rem; padding: 8px 14px; } }
         .word-card:active { cursor: grabbing; transform: scale(1.1); }
-        .word-card.selected {
-            box-shadow: 0 0 0 3px #D4AF37;
-            background-color: #fff3cd !important;
-            transform: scale(1.08);
-        }
-        
-        .word-card.hidden-word {
-            visibility: hidden;
-            position: absolute;
-            pointer-events: none;
-        }
+        .word-card.selected { box-shadow: 0 0 0 3px #D4AF37; background-color: #fff3cd !important; transform: scale(1.08); }
+        .word-card.hidden-word { visibility: hidden; position: absolute; pointer-events: none; }
 
-        /* SVG Overlay for Rhymes - INSIDE poem-container only */
+        /* SVG Overlay for Rhymes */
         #svg-lines {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10; /* Below cards but visible */
         }
-        
-        #poem-container {
-            position: relative;
-        }
+        #poem-container { position: relative; }
         
         .fade-in { animation: fadeIn 0.5s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
+        .floating-aid-btn { position: fixed; right: 10px; top: 50%; transform: translateY(-50%); z-index: 50; transition: all 0.3s ease; }
+        .floating-aid-btn:hover { transform: translateY(-50%) scale(1.1); }
+        #flash-reveal-overlay { z-index: 9999; background: rgba(255, 255, 255, 0.98); }
 
-        /* Modal Styles */
-        .modal-overlay {
-            background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-        }
-
-        /* Floating Button Style */
-        .floating-aid-btn {
-            position: fixed;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 50;
-            transition: all 0.3s ease;
-        }
-        
-        @media (min-width: 768px) {
-            .floating-aid-btn {
-                right: 20px;
-            }
-        }
-        
-        .floating-aid-btn:hover {
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        /* Flash Reveal Container */
-        #flash-reveal-overlay {
-            z-index: 9999;
-            background: rgba(255, 255, 255, 0.98);
-        }
-
-        /* ============ ROULETTE STYLES - FIXED ============ */
-        .roulette-container {
-            position: relative;
-            width: 260px;
-            height: 260px;
-            margin: 0 auto;
-        }
-        
-        @media (min-width: 640px) {
-            .roulette-container {
-                width: 300px;
-                height: 300px;
-            }
-        }
-
+        /* ROULETTE STYLES */
+        .roulette-container { position: relative; width: 260px; height: 260px; margin: 0 auto; }
+        @media (min-width: 640px) { .roulette-container { width: 300px; height: 300px; } }
         .roulette-wheel {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: relative;
-            border: 6px solid #5D4037;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            width: 100%; height: 100%; border-radius: 50%; position: relative;
+            border: 6px solid #5D4037; box-shadow: 0 0 20px rgba(0,0,0,0.3);
             transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-            /* 4 equal segments using conic-gradient */
+            /* Gradient matching the logic: 0-90 Blue, 90-180 Yellow, 180-270 Green, 270-360 Red */
             background: conic-gradient(
                 from 0deg,
-                #3B82F6 0deg 90deg,      /* Blue - ช่วยจัด 3 คำ */
-                #F59E0B 90deg 180deg,    /* Yellow - เปิดเฉลย */
-                #10B981 180deg 270deg,   /* Green - เพิ่มเวลา */
-                #EF4444 270deg 360deg    /* Red - สลับคำ */
+                #3B82F6 0deg 90deg,     /* Blue - 3 คำ */
+                #F59E0B 90deg 180deg,   /* Yellow - เฉลย */
+                #10B981 180deg 270deg,  /* Green - เพิ่มเวลา */
+                #EF4444 270deg 360deg   /* Red - สลับคำ */
             );
         }
-
-        .roulette-icon {
-            position: absolute;
-            font-size: 1.8rem;
-            transform: translate(-50%, -50%);
-        }
-
-        .roulette-icon-a { top: 30%; left: 70%; }
-        .roulette-icon-b { top: 70%; left: 70%; }
-        .roulette-icon-c { top: 70%; left: 30%; }
-        .roulette-icon-d { top: 30%; left: 30%; }
+        .roulette-icon { position: absolute; font-size: 1.8rem; transform: translate(-50%, -50%) rotate(0deg); }
+        /* Positioning icons in center of segments */
+        .roulette-icon-a { top: 25%; left: 75%; transform: translate(-50%, -50%) rotate(45deg); } /* Blue */
+        .roulette-icon-b { top: 75%; left: 75%; transform: translate(-50%, -50%) rotate(135deg); } /* Yellow */
+        .roulette-icon-c { top: 75%; left: 25%; transform: translate(-50%, -50%) rotate(225deg); } /* Green */
+        .roulette-icon-d { top: 25%; left: 25%; transform: translate(-50%, -50%) rotate(315deg); } /* Red */
 
         .roulette-pointer {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid #E91E63;
-            z-index: 10;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
+            border-top: 30px solid #E91E63; z-index: 10; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
-
         .roulette-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #D4AF37, #B8860B);
-            border-radius: 50%;
-            border: 4px solid #5D4037;
-            z-index: 5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 50px; height: 50px; background: linear-gradient(135deg, #D4AF37, #B8860B);
+            border-radius: 50%; border: 4px solid #5D4037; z-index: 5;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
         }
+        .spinning-glow { animation: pulse-glow 0.3s infinite; }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); } 50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.8); } }
+        .result-reveal { animation: resultPop 0.5s ease-out; }
+        @keyframes resultPop { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
 
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
-            50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.8); }
-        }
-
-        .spinning-glow {
-            animation: pulse-glow 0.3s infinite;
-        }
-
-        /* Result Animation */
-        .result-reveal {
-            animation: resultPop 0.5s ease-out;
-        }
-
-        @keyframes resultPop {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        /* ============ LOGO ANIMATION ============ */
-        .logo-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .logo-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 3px solid #D4AF37;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-            animation: logoFloat 3s ease-in-out infinite, logoGlow 2s ease-in-out infinite alternate;
-        }
-
-        @media (min-width: 768px) {
-            .logo-img {
-                width: 80px;
-                height: 80px;
-            }
-        }
-
-        @keyframes logoFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-5px) rotate(2deg); }
-            50% { transform: translateY(0) rotate(0deg); }
-            75% { transform: translateY(-3px) rotate(-2deg); }
-        }
-
-        @keyframes logoGlow {
-            0% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.4), 0 0 20px rgba(212, 175, 55, 0.2); }
-            100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.8), 0 0 40px rgba(212, 175, 55, 0.4), 0 0 60px rgba(212, 175, 55, 0.2); }
-        }
-
-        .logo-ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90px;
-            height: 90px;
-            border: 2px solid rgba(212, 175, 55, 0.5);
-            border-radius: 50%;
-            animation: logoRingPulse 2s ease-out infinite;
-        }
-
-        @media (min-width: 768px) {
-            .logo-ring {
-                width: 110px;
-                height: 110px;
-            }
-        }
-
-        @keyframes logoRingPulse {
-            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
-        }
-
-        .logo-sparkle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #D4AF37;
-            border-radius: 50%;
-            animation: sparkle 1.5s ease-in-out infinite;
-        }
-
-        .logo-sparkle:nth-child(2) { top: 0; left: 50%; animation-delay: 0s; }
-        .logo-sparkle:nth-child(3) { top: 50%; right: 0; animation-delay: 0.3s; }
-        .logo-sparkle:nth-child(4) { bottom: 0; left: 50%; animation-delay: 0.6s; }
-        .logo-sparkle:nth-child(5) { top: 50%; left: 0; animation-delay: 0.9s; }
-
-        @keyframes sparkle {
-            0%, 100% { transform: scale(0); opacity: 0; }
-            50% { transform: scale(1); opacity: 1; }
-        }
+        /* Logo Animation */
+        .logo-container { position: relative; display: inline-block; }
+        .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #D4AF37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); animation: logoFloat 3s ease-in-out infinite, logoGlow 2s ease-in-out infinite alternate; }
+        @media (min-width: 768px) { .logo-img { width: 80px; height: 80px; } }
+        @keyframes logoFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-5px) rotate(2deg); } 50% { transform: translateY(0) rotate(0deg); } 75% { transform: translateY(-3px) rotate(-2deg); } }
+        @keyframes logoGlow { 0% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.4); } 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.8); } }
+        .logo-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90px; height: 90px; border: 2px solid rgba(212, 175, 55, 0.5); border-radius: 50%; animation: logoRingPulse 2s ease-out infinite; }
+        @media (min-width: 768px) { .logo-ring { width: 110px; height: 110px; } }
+        @keyframes logoRingPulse { 0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-2 md:p-4 relative overflow-x-hidden">
@@ -365,24 +131,16 @@
         
         <header class="bg-brown-main text-white p-3 md:p-6 text-center shadow-md relative">
             <div class="absolute top-0 left-0 w-full h-2 bg-gold"></div>
-            
-            <!-- Animated Logo -->
             <div class="flex justify-center mb-3">
                 <div class="logo-container">
                     <div class="logo-ring"></div>
-                    <span class="logo-sparkle"></span>
-                    <span class="logo-sparkle"></span>
-                    <span class="logo-sparkle"></span>
-                    <span class="logo-sparkle"></span>
                     <img src="https://nonthaphathr.github.io/uploadimg/logokhampraphan-non.png" alt="Logo" class="logo-img">
                 </div>
             </div>
-            
             <h1 class="text-lg md:text-3xl font-bold mb-1 md:mb-2 text-gold">เกมลากและวางสร้างอินทรวิเชียรฉันท์ ๑๑</h1>
             <p class="text-xs md:text-sm opacity-90">พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง</p>
         </header>
 
-        <!-- REGISTRATION PAGE -->
         <div id="page-register" class="p-4 md:p-8 fade-in flex-grow flex items-center justify-center">
             <div class="w-full max-w-md">
                 <h2 class="text-2xl font-bold text-brown-main mb-6 text-center border-b-2 border-gold pb-2 inline-block w-full">ลงทะเบียน</h2>
@@ -424,13 +182,22 @@
                         <input type="number" id="number" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none" min="1" required>
                     </div>
                     <button type="submit" class="w-full bg-gold text-brown-main font-bold py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition duration-200 mt-4 text-lg">
-                        เริ่มเล่นเกม 🎮
+                        ลงทะเบียนและเริ่มเล่น 🎮
+                    </button>
+                    
+                    <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-gray-300"></div>
+                        <span class="flex-shrink-0 mx-4 text-gray-400 text-xs">หรือ</span>
+                        <div class="flex-grow border-t border-gray-300"></div>
+                    </div>
+                    
+                    <button type="button" onclick="startGuestGame()" class="w-full bg-gray-100 text-gray-600 font-semibold py-2 rounded-xl border border-gray-300 hover:bg-gray-200 transition duration-200 text-sm">
+                        👤 ทดลองเล่น (ไม่ต้องลงทะเบียน)
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- GAME PAGE -->
         <div id="page-game" class="hidden relative flex-grow flex flex-col">
             <div class="flex flex-wrap justify-between items-center bg-yellow-50 p-2 md:p-4 border-b border-gray-200 gap-2">
                 <div class="font-bold text-brown-main text-xs md:text-base">
@@ -443,7 +210,6 @@
                 </div>
             </div>
 
-            <!-- SPECIAL AID BUTTON -->
             <div id="special-aid-container" class="hidden floating-aid-btn">
                 <button onclick="showRouletteModal()" class="flex flex-col items-center justify-center bg-gradient-to-r from-purple-500 to-pink-600 text-white w-16 h-16 md:w-24 md:h-24 rounded-full shadow-2xl border-4 border-white animate-bounce hover:animate-none group">
                     <span class="text-xl md:text-3xl mb-0.5 group-hover:scale-110 transition">🎰</span>
@@ -459,8 +225,7 @@
 
                 <div class="bg-white p-2 md:p-4 rounded-xl border-2 border-dashed border-gray-300 relative z-10 max-w-4xl mx-auto" id="poem-container">
                     <svg id="svg-lines"></svg>
-                    <!-- Dynamic content will be generated here -->
-                </div>
+                    </div>
 
                 <div class="mt-4 md:mt-8">
                     <h4 class="text-center font-bold text-gray-700 mb-2 text-sm md:text-base">คลังคำศัพท์ (ลาก หรือ คลิก)</h4>
@@ -479,7 +244,6 @@
             </div>
         </div>
 
-        <!-- RESULT PAGE -->
         <div id="page-result" class="hidden p-4 md:p-8 text-center fade-in flex-grow flex flex-col justify-center">
             
             <h2 class="text-2xl md:text-3xl font-bold text-brown-main mb-2">สรุปผลคะแนน</h2>
@@ -509,7 +273,6 @@
 
     </div>
 
-    <!-- QUIZ MODAL -->
     <div id="quiz-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full border-4 border-purple-400 transform scale-100 transition-transform">
             <h3 class="text-xl font-bold text-purple-700 text-center mb-4">🎁 คำถามชิงสิทธิ์หมุนวงล้อ!</h3>
@@ -520,7 +283,6 @@
         </div>
     </div>
 
-    <!-- ROULETTE MODAL -->
     <div id="roulette-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl p-4 md:p-6 max-w-md w-full border-4 border-gold">
             <h3 class="text-xl md:text-2xl font-bold text-brown-main text-center mb-4">🎰 หมุนวงล้อลุ้นตัวช่วย!</h3>
@@ -528,7 +290,6 @@
             <div class="roulette-container">
                 <div class="roulette-pointer"></div>
                 <div class="roulette-wheel" id="roulette-wheel">
-                    <!-- Icons positioned on wheel -->
                     <span class="roulette-icon roulette-icon-a">🤖</span>
                     <span class="roulette-icon roulette-icon-b">⚡</span>
                     <span class="roulette-icon roulette-icon-c">⏰</span>
@@ -553,7 +314,6 @@
         </div>
     </div>
 
-    <!-- FLASH REVEAL OVERLAY -->
     <div id="flash-reveal-overlay" class="fixed inset-0 hidden flex items-center justify-center">
         <div id="flash-answer-content" class="text-xl md:text-4xl font-bold text-brown-main text-center bg-white p-4 md:p-10 rounded-xl shadow-2xl border-8 border-gold m-4 leading-loose">
         </div>
@@ -563,46 +323,16 @@
         // --- Configuration ---
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3ek50qmc39njmYK0HRiWq_GXpclneLZdhW5FR-iLbdjWuieHbVrMO0BHnq78d8KQHNQ/exec';
 
-        // --- POEM DATA (3 poems to randomize) ---
+        // --- POEM DATA ---
         const POEMS_DATA = [
             {
                 id: 1,
                 displayText: "เนื่องนับอเนกแนว\nระยะแถวตลอดลาย\nเฆี่ยนครบสยบกาย\nศิระพับพะกับคา",
                 verses: [
-                    // Verse 1 (5 syllables)
-                    [
-                        { word: "เนื่อง", type: "ครุ" },
-                        { word: "นับ", type: "ครุ" },
-                        { word: "อ", type: "ลหุ" },
-                        { word: "เนก", type: "ครุ" },
-                        { word: "แนว", type: "ครุ", rhyme: "send1" }
-                    ],
-                    // Verse 2 (6 syllables)
-                    [
-                        { word: "ระ", type: "ลหุ" },
-                        { word: "ยะ", type: "ลหุ" },
-                        { word: "แถว", type: "ครุ", rhyme: "recv1" },
-                        { word: "ต", type: "ลหุ" },
-                        { word: "ลอด", type: "ครุ" },
-                        { word: "ลาย", type: "ครุ", rhyme: "send2" }
-                    ],
-                    // Verse 3 (5 syllables)
-                    [
-                        { word: "เฆี่ยน", type: "ครุ" },
-                        { word: "ครบ", type: "ครุ" },
-                        { word: "ส", type: "ลหุ" },
-                        { word: "ยบ", type: "ครุ" },
-                        { word: "กาย", type: "ครุ", rhyme: "recv2" }
-                    ],
-                    // Verse 4 (6 syllables)
-                    [
-                        { word: "ศิ", type: "ลหุ" },
-                        { word: "ระ", type: "ลหุ" },
-                        { word: "พับ", type: "ครุ" },
-                        { word: "พะ", type: "ลหุ" },
-                        { word: "กับ", type: "ครุ" },
-                        { word: "คา", type: "ครุ" }
-                    ]
+                    [{ word: "เนื่อง", type: "ครุ" }, { word: "นับ", type: "ครุ" }, { word: "อ", type: "ลหุ" }, { word: "เนก", type: "ครุ" }, { word: "แนว", type: "ครุ", rhyme: "send1" }],
+                    [{ word: "ระ", type: "ลหุ" }, { word: "ยะ", type: "ลหุ" }, { word: "แถว", type: "ครุ", rhyme: "recv1" }, { word: "ต", type: "ลหุ" }, { word: "ลอด", type: "ครุ" }, { word: "ลาย", type: "ครุ", rhyme: "send2" }],
+                    [{ word: "เฆี่ยน", type: "ครุ" }, { word: "ครบ", type: "ครุ" }, { word: "ส", type: "ลหุ" }, { word: "ยบ", type: "ครุ" }, { word: "กาย", type: "ครุ", rhyme: "recv2" }],
+                    [{ word: "ศิ", type: "ลหุ" }, { word: "ระ", type: "ลหุ" }, { word: "พับ", type: "ครุ" }, { word: "พะ", type: "ลหุ" }, { word: "กับ", type: "ครุ" }, { word: "คา", type: "ครุ" }]
                 ],
                 lahuPool: ["อ", "ระ", "ยะ", "ต", "ส", "ศิ", "พะ"],
                 kruPool: ["เนื่อง", "นับ", "เนก", "แนว", "แถว", "ลอด", "ลาย", "เฆี่ยน", "ครบ", "ยบ", "กาย", "พับ", "กับ", "คา"]
@@ -611,36 +341,10 @@
                 id: 2,
                 displayText: "สุขนักมิน้อยเลย\nขณะเฉยมิสนใด\nก่นด่าจะจากใคร\nก็บ่รับประทับจำ",
                 verses: [
-                    [
-                        { word: "สุข", type: "ครุ" },
-                        { word: "นัก", type: "ครุ" },
-                        { word: "มิ", type: "ลหุ" },
-                        { word: "น้อย", type: "ครุ" },
-                        { word: "เลย", type: "ครุ", rhyme: "send1" }
-                    ],
-                    [
-                        { word: "ข", type: "ลหุ" },
-                        { word: "ณะ", type: "ลหุ" },
-                        { word: "เฉย", type: "ครุ", rhyme: "recv1" },
-                        { word: "มิ", type: "ลหุ" },
-                        { word: "สน", type: "ครุ" },
-                        { word: "ใด", type: "ครุ", rhyme: "send2" }
-                    ],
-                    [
-                        { word: "ก่น", type: "ครุ" },
-                        { word: "ด่า", type: "ครุ" },
-                        { word: "จะ", type: "ลหุ" },
-                        { word: "จาก", type: "ครุ" },
-                        { word: "ใคร", type: "ครุ", rhyme: "recv2" }
-                    ],
-                    [
-                        { word: "ก็", type: "ลหุ" },
-                        { word: "บ่", type: "ลหุ" },
-                        { word: "รับ", type: "ครุ" },
-                        { word: "ประ", type: "ลหุ" },
-                        { word: "ทับ", type: "ครุ" },
-                        { word: "จำ", type: "ครุ" }
-                    ]
+                    [{ word: "สุข", type: "ครุ" }, { word: "นัก", type: "ครุ" }, { word: "มิ", type: "ลหุ" }, { word: "น้อย", type: "ครุ" }, { word: "เลย", type: "ครุ", rhyme: "send1" }],
+                    [{ word: "ข", type: "ลหุ" }, { word: "ณะ", type: "ลหุ" }, { word: "เฉย", type: "ครุ", rhyme: "recv1" }, { word: "มิ", type: "ลหุ" }, { word: "สน", type: "ครุ" }, { word: "ใด", type: "ครุ", rhyme: "send2" }],
+                    [{ word: "ก่น", type: "ครุ" }, { word: "ด่า", type: "ครุ" }, { word: "จะ", type: "ลหุ" }, { word: "จาก", type: "ครุ" }, { word: "ใคร", type: "ครุ", rhyme: "recv2" }],
+                    [{ word: "ก็", type: "ลหุ" }, { word: "บ่", type: "ลหุ" }, { word: "รับ", type: "ครุ" }, { word: "ประ", type: "ลหุ" }, { word: "ทับ", type: "ครุ" }, { word: "จำ", type: "ครุ" }]
                 ],
                 lahuPool: ["มิ", "ข", "ณะ", "จะ", "ก็", "บ่", "ประ"],
                 kruPool: ["สุข", "นัก", "น้อย", "เลย", "เฉย", "สน", "ใด", "ก่น", "ด่า", "จาก", "ใคร", "รับ", "ทับ", "จำ"]
@@ -649,36 +353,10 @@
                 id: 3,
                 displayText: "ชีวิตสิโปร่งเบา\nสละเขลามิสุมกอง\nปล่อยวาง ณ ครรลอง\nฤดิโล่งสบายเลย",
                 verses: [
-                    [
-                        { word: "ชี", type: "ครุ" },
-                        { word: "วิต", type: "ครุ" },
-                        { word: "สิ", type: "ลหุ" },
-                        { word: "โปร่ง", type: "ครุ" },
-                        { word: "เบา", type: "ครุ", rhyme: "send1" }
-                    ],
-                    [
-                        { word: "ส", type: "ลหุ" },
-                        { word: "ละ", type: "ลหุ" },
-                        { word: "เขลา", type: "ครุ", rhyme: "recv1" },
-                        { word: "มิ", type: "ลหุ" },
-                        { word: "สุม", type: "ครุ" },
-                        { word: "กอง", type: "ครุ", rhyme: "send2" }
-                    ],
-                    [
-                        { word: "ปล่อย", type: "ครุ" },
-                        { word: "วาง", type: "ครุ" },
-                        { word: "ณ", type: "ลหุ" },
-                        { word: "ครร", type: "ครุ" },
-                        { word: "ลอง", type: "ครุ", rhyme: "recv2" }
-                    ],
-                    [
-                        { word: "ฤ", type: "ลหุ" },
-                        { word: "ดิ", type: "ลหุ" },
-                        { word: "โล่ง", type: "ครุ" },
-                        { word: "ส", type: "ลหุ" },
-                        { word: "บาย", type: "ครุ" },
-                        { word: "เลย", type: "ครุ" }
-                    ]
+                    [{ word: "ชี", type: "ครุ" }, { word: "วิต", type: "ครุ" }, { word: "สิ", type: "ลหุ" }, { word: "โปร่ง", type: "ครุ" }, { word: "เบา", type: "ครุ", rhyme: "send1" }],
+                    [{ word: "ส", type: "ลหุ" }, { word: "ละ", type: "ลหุ" }, { word: "เขลา", type: "ครุ", rhyme: "recv1" }, { word: "มิ", type: "ลหุ" }, { word: "สุม", type: "ครุ" }, { word: "กอง", type: "ครุ", rhyme: "send2" }],
+                    [{ word: "ปล่อย", type: "ครุ" }, { word: "วาง", type: "ครุ" }, { word: "ณ", type: "ลหุ" }, { word: "ครร", type: "ครุ" }, { word: "ลอง", type: "ครุ", rhyme: "recv2" }],
+                    [{ word: "ฤ", type: "ลหุ" }, { word: "ดิ", type: "ลหุ" }, { word: "โล่ง", type: "ครุ" }, { word: "ส", type: "ลหุ" }, { word: "บาย", type: "ครุ" }, { word: "เลย", type: "ครุ" }]
                 ],
                 lahuPool: ["สิ", "ส", "ละ", "มิ", "ณ", "ฤ", "ดิ"],
                 kruPool: ["ชี", "วิต", "โปร่ง", "เบา", "เขลา", "สุม", "กอง", "ปล่อย", "วาง", "ครร", "ลอง", "โล่ง", "บาย", "เลย"]
@@ -694,11 +372,11 @@
             selectedWord: null,
             currentPoem: null,
             allWords: [],
-            quizTriggered: {},  // Track which minute marks have triggered
-            bonusTime: 0  // Extra time from roulette
+            quizTriggered: {}, 
+            bonusTime: 0,
+            isGuest: false
         };
 
-        // --- Sound Functions ---
         function playSound(soundId) {
             const sound = document.getElementById(soundId);
             if (sound) {
@@ -708,12 +386,21 @@
         }
 
         // --- Initialization ---
+        function startGuestGame() {
+            gameState.isGuest = true;
+            gameState.player = {
+                prefix: '',
+                level: '-',
+                firstname: 'ผู้เยี่ยมชม',
+                lastname: '(Guest)',
+                number: '-'
+            };
+            initGame();
+        }
+
         function startGame(e) {
             e.preventDefault();
-            
-            // Play start sound
-            playSound('sound-start');
-            
+            gameState.isGuest = false;
             gameState.player = {
                 prefix: document.getElementById('prefix').value,
                 level: document.getElementById('class-level').value,
@@ -721,12 +408,20 @@
                 lastname: document.getElementById('lastname').value,
                 number: document.getElementById('number').value
             };
+            initGame();
+        }
 
+        function initGame() {
+            playSound('sound-start');
             document.getElementById('page-register').classList.add('hidden');
             document.getElementById('page-game').classList.remove('hidden');
-            document.getElementById('player-name-display').innerText = `ผู้เล่น: ${gameState.player.firstname} ${gameState.player.level}`;
+            
+            if (gameState.isGuest) {
+                 document.getElementById('player-name-display').innerText = `ผู้เล่น: ผู้เยี่ยมชม (Guest)`;
+            } else {
+                document.getElementById('player-name-display').innerText = `ผู้เล่น: ${gameState.player.firstname} ${gameState.player.level}`;
+            }
 
-            // Randomly select a poem
             const randomIndex = Math.floor(Math.random() * POEMS_DATA.length);
             gameState.currentPoem = POEMS_DATA[randomIndex];
             document.getElementById('poem-number').innerText = gameState.currentPoem.id;
@@ -738,10 +433,9 @@
             window.addEventListener('resize', drawRhymeLines);
         }
 
-        // --- Dynamic Poem UI Generation ---
+        // --- Dynamic Poem UI ---
         function setupPoemUI() {
             const container = document.getElementById('poem-container');
-            // Keep SVG element, clear everything else
             const svg = document.getElementById('svg-lines');
             container.innerHTML = '';
             container.appendChild(svg);
@@ -764,24 +458,17 @@
                     dropZone.dataset.target = syllable.word;
                     dropZone.dataset.type = syllable.type;
                     
-                    // Set IDs for rhyme connections
-                    if (syllable.rhyme === 'send1') {
-                        dropZone.id = 'slot-1-5';
-                    } else if (syllable.rhyme === 'recv1') {
-                        dropZone.id = 'slot-2-3';
-                    } else if (syllable.rhyme === 'send2') {
-                        dropZone.id = 'slot-2-6';
-                    } else if (syllable.rhyme === 'recv2') {
-                        dropZone.id = 'slot-3-5';
-                    }
+                    // IDs for rhymes
+                    if (syllable.rhyme === 'send1') dropZone.id = 'slot-1-5';
+                    else if (syllable.rhyme === 'recv1') dropZone.id = 'slot-2-3';
+                    else if (syllable.rhyme === 'send2') dropZone.id = 'slot-2-6';
+                    else if (syllable.rhyme === 'recv2') dropZone.id = 'slot-3-5';
 
                     const typeLabel = document.createElement('div');
                     typeLabel.className = `text-[9px] md:text-[10px] text-center mt-0.5 font-bold ${syllable.type === 'ครุ' ? 'text-blue-600' : 'text-red-500'}`;
                     
                     let labelText = syllable.type;
-                    if (syllable.rhyme) {
-                        labelText += syllable.rhyme.includes('send') ? ' (ส่ง)' : ' (รับ)';
-                    }
+                    // if (syllable.rhyme) labelText += syllable.rhyme.includes('send') ? ' (ส่ง)' : ' (รับ)'; // Hide text label for clearer look
                     typeLabel.innerText = labelText;
 
                     verseGroup.appendChild(dropZone);
@@ -792,10 +479,8 @@
                 container.appendChild(verseRow);
             });
 
-            // Setup word bank
             setupWordBank();
             
-            // Add event listeners to drop zones
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 zone.addEventListener('dragover', dragOver);
                 zone.addEventListener('dragleave', dragLeave);
@@ -807,7 +492,6 @@
         function setupWordBank() {
             const wordBank = document.getElementById('word-bank');
             wordBank.innerHTML = '';
-            
             const shuffledWords = [...gameState.allWords].sort(() => Math.random() - 0.5);
 
             shuffledWords.forEach((word, index) => {
@@ -821,7 +505,6 @@
                 el.addEventListener('dragend', dragEnd);
                 el.addEventListener('click', () => selectWord(el));
                 
-                // Touch events for mobile
                 el.addEventListener('touchstart', touchStart, { passive: false });
                 el.addEventListener('touchmove', touchMove, { passive: false });
                 el.addEventListener('touchend', touchEnd);
@@ -830,7 +513,7 @@
             });
         }
 
-        // --- Timer Logic & Special Events ---
+        // --- Timer & Events ---
         function startTimer() {
             gameState.startTime = Date.now();
             gameState.timerInterval = setInterval(() => {
@@ -842,21 +525,17 @@
                 const seconds = (displaySeconds % 60).toString().padStart(2, '0');
                 document.getElementById('timer').innerText = `${minutes}:${seconds}`;
 
-                // Trigger quiz every 2 minutes (120s, 240s, 360s, etc.)
                 const minuteMark = Math.floor(displaySeconds / 120);
                 if (displaySeconds > 0 && displaySeconds % 120 === 0 && !gameState.quizTriggered[minuteMark]) {
                     gameState.quizTriggered[minuteMark] = true;
                     showSpecialQuiz();
                 }
-
             }, 1000);
         }
 
-        // --- Special Quiz Logic ---
+        // --- Quiz ---
         function showSpecialQuiz() {
-            // Play quiz sound
             playSound('sound-quiz');
-            
             const modal = document.getElementById('quiz-modal');
             const optionsContainer = document.getElementById('quiz-options');
             optionsContainer.innerHTML = '';
@@ -886,26 +565,14 @@
             modal.classList.add('hidden');
 
             if (isCorrect) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'ถูกต้อง!',
-                    text: 'คุณได้รับสิทธิ์หมุนวงล้อลุ้นตัวช่วย!',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
+                Swal.fire({ icon: 'success', title: 'ถูกต้อง!', text: 'คุณได้รับสิทธิ์หมุนวงล้อ!', timer: 2000, showConfirmButton: false });
                 document.getElementById('special-aid-container').classList.remove('hidden');
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'ผิดครับ',
-                    text: 'น่าเสียดาย รอโอกาสหน้านะครับ',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
+                Swal.fire({ icon: 'error', title: 'ผิดครับ', text: 'น่าเสียดาย รอโอกาสหน้านะครับ', timer: 2000, showConfirmButton: false });
             }
         }
 
-        // --- ROULETTE SYSTEM ---
+        // --- ROULETTE SYSTEM (CORRECTED) ---
         function showRouletteModal() {
             document.getElementById('roulette-modal').classList.remove('hidden');
             document.getElementById('roulette-result').classList.add('hidden');
@@ -917,37 +584,27 @@
         function spinRoulette() {
             const wheel = document.getElementById('roulette-wheel');
             const spinBtn = document.getElementById('spin-btn');
-            const resultDiv = document.getElementById('roulette-result');
             
             spinBtn.disabled = true;
             spinBtn.classList.add('opacity-50');
             wheel.classList.add('spinning-glow');
             
-            // Random result: 0=A(Blue), 1=B(Yellow), 2=C(Green), 3=D(Red)
+            // Result Index: 0=Blue, 1=Yellow, 2=Green, 3=Red
             const result = Math.floor(Math.random() * 4);
             
-            /*
-             * conic-gradient starts from top (0deg) clockwise:
-             * - Blue (A): 0-90deg, center at 45deg
-             * - Yellow (B): 90-180deg, center at 135deg
-             * - Green (C): 180-270deg, center at 225deg
-             * - Red (D): 270-360deg, center at 315deg
-             * 
-             * To land on a segment, we rotate the wheel so that segment's center
-             * aligns with the pointer at top (0deg).
-             * 
-             * Rotation needed = 360 - center_angle (to bring center to top)
-             * - Blue: 360 - 45 = 315deg
-             * - Yellow: 360 - 135 = 225deg
-             * - Green: 360 - 225 = 135deg
-             * - Red: 360 - 315 = 45deg
-             */
-            const landingAngles = [315, 225, 135, 45]; // A, B, C, D
+            // Rotation Calculation to match CSS Conic Gradient
+            // Gradient starts 0deg at Top (12 o'clock) going Clockwise:
+            // 0-90: Blue (Index 0) -> Target Center 45deg to Top -> Rotate CCW 45 (or 315)
+            // 90-180: Yellow (Index 1) -> Target Center 135deg to Top -> Rotate CCW 135 (or 225)
+            // 180-270: Green (Index 2) -> Target Center 225deg to Top -> Rotate CCW 225 (or 135)
+            // 270-360: Red (Index 3) -> Target Center 315deg to Top -> Rotate CCW 315 (or 45)
+
+            const targetAngles = [315, 225, 135, 45]; // Angles for [Blue, Yellow, Green, Red]
             
-            // Base spins (3-5 full rotations) + landing angle + small variance
-            const baseSpins = 1080 + Math.floor(Math.random() * 720);
-            const variance = Math.random() * 30 - 15; // -15 to +15 degrees
-            const finalRotation = baseSpins + landingAngles[result] + variance;
+            // Base spins + target + randomness
+            const baseSpins = 1440; // 4 full spins
+            const variance = Math.floor(Math.random() * 20) - 10; // +/- 10 deg randomness within segment
+            const finalRotation = baseSpins + targetAngles[result] + variance;
             
             wheel.style.transform = `rotate(${finalRotation}deg)`;
             
@@ -960,13 +617,12 @@
         function showRouletteResult(result) {
             const resultDiv = document.getElementById('roulette-result');
             resultDiv.classList.remove('hidden');
-            resultDiv.classList.add('result-reveal');
             
             const results = [
-                { emoji: '🤖', text: 'ช่วยจัดคำลงช่อง 3 คำ!', color: 'bg-blue-100 border-blue-400', action: 'autofill' },
-                { emoji: '⚡', text: 'เปิดเฉลย 1 วินาที!', color: 'bg-yellow-100 border-yellow-400', action: 'flash' },
-                { emoji: '⏰', text: 'เพิ่มเวลา 30 วินาที!', color: 'bg-green-100 border-green-400', action: 'addtime' },
-                { emoji: '🔀', text: 'สลับตำแหน่ง 3 คำ!', color: 'bg-red-100 border-red-400', action: 'shuffle' }
+                { emoji: '🤖', text: 'ช่วยจัดคำลงช่อง 3 คำ!', color: 'bg-blue-100 border-blue-400', action: 'autofill' }, // Blue
+                { emoji: '⚡', text: 'เปิดเฉลย 1 วินาที!', color: 'bg-yellow-100 border-yellow-400', action: 'flash' },     // Yellow
+                { emoji: '⏰', text: 'เพิ่มเวลา 30 วินาที!', color: 'bg-green-100 border-green-400', action: 'addtime' },    // Green
+                { emoji: '🔀', text: 'สลับตำแหน่ง 3 คำ!', color: 'bg-red-100 border-red-400', action: 'shuffle' }       // Red
             ];
             
             const r = results[result];
@@ -985,18 +641,10 @@
             document.getElementById('special-aid-container').classList.add('hidden');
             
             switch(action) {
-                case 'autofill':
-                    autoFillWords(3);
-                    break;
-                case 'flash':
-                    flashReveal();
-                    break;
-                case 'addtime':
-                    addBonusTime(30);
-                    break;
-                case 'shuffle':
-                    shuffleCorrectWords(3);
-                    break;
+                case 'autofill': autoFillWords(3); break;
+                case 'flash': flashReveal(); break;
+                case 'addtime': addBonusTime(30); break;
+                case 'shuffle': shuffleCorrectWords(3); break;
             }
         }
 
@@ -1007,12 +655,10 @@
             let filled = 0;
             for (let zone of emptyZones) {
                 if (filled >= count) break;
-                
                 const targetText = zone.dataset.target;
                 const wordBank = document.getElementById('word-bank');
                 const words = Array.from(wordBank.children);
                 const matchingWord = words.find(w => w.innerText.trim() === targetText && !w.classList.contains('hidden-word'));
-
                 if (matchingWord) {
                     moveWordToZone(matchingWord, zone);
                     filled++;
@@ -1026,9 +672,7 @@
             const content = document.getElementById('flash-answer-content');
             content.innerHTML = gameState.currentPoem.displayText.replace(/\n/g, '<br>');
             overlay.classList.remove('hidden');
-            setTimeout(() => {
-                overlay.classList.add('hidden');
-            }, 1000);
+            setTimeout(() => { overlay.classList.add('hidden'); }, 1000);
         }
 
         function addBonusTime(seconds) {
@@ -1040,24 +684,20 @@
             const dropZones = Array.from(document.querySelectorAll('.drop-zone'));
             const correctZones = dropZones.filter(zone => {
                 if (zone.children.length === 0) return false;
-                const placedWord = zone.children[0].innerText.trim();
-                return placedWord === zone.dataset.target;
+                return zone.children[0].innerText.trim() === zone.dataset.target;
             });
-
             const shuffled = correctZones.sort(() => Math.random() - 0.5).slice(0, count);
             const wordBank = document.getElementById('word-bank');
-
             shuffled.forEach(zone => {
                 const wordEl = zone.children[0];
                 wordBank.appendChild(wordEl);
                 wordEl.classList.remove('hidden-word');
                 zone.classList.remove('filled', 'bg-green-100', 'border-green-500');
             });
-
             Swal.fire({ icon: 'warning', title: `สลับ ${shuffled.length} คำกลับไปคลังคำ!`, timer: 1500, showConfirmButton: false });
         }
 
-        // --- IMPROVED DRAG & DROP / TAP LOGIC ---
+        // --- Drag & Drop ---
         let touchDragging = null;
         let touchClone = null;
 
@@ -1067,186 +707,122 @@
             setTimeout(() => e.target.classList.add('hidden-word'), 0);
             gameState.selectedWord = e.target;
         }
-
         function dragEnd(e) {
             e.target.classList.remove('hidden-word');
-            // Clear selection if drag completed
             if (gameState.selectedWord === e.target) {
                 gameState.selectedWord.classList.remove('selected');
                 gameState.selectedWord = null;
             }
         }
-
         function dragOver(e) {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
             const zone = e.target.closest('.drop-zone');
             if (zone) zone.classList.add('hovered');
         }
-
         function dragLeave(e) {
             const zone = e.target.closest('.drop-zone');
             if (zone) zone.classList.remove('hovered');
         }
-
         function drop(e) {
             e.preventDefault();
             const zone = e.target.closest('.drop-zone');
             if (!zone) return;
-            
             zone.classList.remove('hovered');
             const id = e.dataTransfer.getData('text/plain');
             const draggable = document.getElementById(id);
-            
             if (zone && draggable) {
-                // If zone has a word, return it to bank first
-                if (zone.children.length > 0) {
-                    const existingItem = zone.children[0];
-                    returnToWordBank(existingItem);
-                }
+                if (zone.children.length > 0) returnToWordBank(zone.children[0]);
                 moveWordToZone(draggable, zone);
             }
         }
-
-        // Touch events for mobile
+        // Touch Handlers
         function touchStart(e) {
             if (e.touches.length !== 1) return;
-            
             const touch = e.touches[0];
             touchDragging = e.target;
-            
-            // Create visual clone
             touchClone = e.target.cloneNode(true);
             touchClone.style.position = 'fixed';
             touchClone.style.zIndex = '9999';
             touchClone.style.pointerEvents = 'none';
             touchClone.style.opacity = '0.8';
-            touchClone.style.transform = 'scale(1.1)';
             document.body.appendChild(touchClone);
-            
             updateTouchClonePosition(touch);
             e.target.classList.add('hidden-word');
-            
             e.preventDefault();
         }
-
         function touchMove(e) {
             if (!touchDragging || e.touches.length !== 1) return;
-            
             const touch = e.touches[0];
             updateTouchClonePosition(touch);
-            
-            // Highlight drop zone under finger
             const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
             document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('hovered'));
-            
             if (elementUnder) {
                 const zone = elementUnder.closest('.drop-zone');
                 if (zone) zone.classList.add('hovered');
             }
-            
             e.preventDefault();
         }
-
         function touchEnd(e) {
             if (!touchDragging) return;
-            
-            // Remove clone
-            if (touchClone && touchClone.parentNode) {
-                touchClone.parentNode.removeChild(touchClone);
-            }
+            if (touchClone && touchClone.parentNode) touchClone.parentNode.removeChild(touchClone);
             touchClone = null;
-            
-            // Find drop zone
             const touch = e.changedTouches[0];
             const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
-            
             document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('hovered'));
-            
             if (elementUnder) {
                 const zone = elementUnder.closest('.drop-zone');
                 if (zone) {
-                    // If zone has a word, return it to bank
-                    if (zone.children.length > 0) {
-                        const existingItem = zone.children[0];
-                        returnToWordBank(existingItem);
-                    }
+                    if (zone.children.length > 0) returnToWordBank(zone.children[0]);
                     moveWordToZone(touchDragging, zone);
-                } else {
-                    // Return to original position
-                    touchDragging.classList.remove('hidden-word');
-                }
-            } else {
-                touchDragging.classList.remove('hidden-word');
-            }
-            
+                } else touchDragging.classList.remove('hidden-word');
+            } else touchDragging.classList.remove('hidden-word');
             touchDragging = null;
         }
-
         function updateTouchClonePosition(touch) {
             if (touchClone) {
                 touchClone.style.left = (touch.clientX - 30) + 'px';
                 touchClone.style.top = (touch.clientY - 20) + 'px';
             }
         }
-
         function selectWord(el) {
-            // If clicking the same selected word in bank, deselect
             if (gameState.selectedWord === el) {
                 el.classList.remove('selected');
                 gameState.selectedWord = null;
                 return;
             }
-            
-            // Deselect previous
-            if (gameState.selectedWord) {
-                gameState.selectedWord.classList.remove('selected');
-            }
-            
-            // If clicking a word that's in a drop-zone, return it to bank first
+            if (gameState.selectedWord) gameState.selectedWord.classList.remove('selected');
             if (el.parentElement && el.parentElement.classList.contains('drop-zone')) {
                 returnToWordBank(el);
                 gameState.selectedWord = null;
                 return;
             }
-            
             gameState.selectedWord = el;
             el.classList.add('selected');
         }
-
         function placeSelectedWord(zone) {
             if (!gameState.selectedWord) return;
-            
-            // If zone has a word, return it to bank first
-            if (zone.children.length > 0) {
-                const existingItem = zone.children[0];
-                returnToWordBank(existingItem);
-            }
-
+            if (zone.children.length > 0) returnToWordBank(zone.children[0]);
             moveWordToZone(gameState.selectedWord, zone);
             gameState.selectedWord.classList.remove('selected');
             gameState.selectedWord = null;
         }
-
         function moveWordToZone(item, zone) {
             item.classList.remove('hidden-word');
             zone.appendChild(item);
             zone.classList.add('filled');
         }
-
         function returnToWordBank(item) {
             const wordBank = document.getElementById('word-bank');
             item.classList.remove('hidden-word');
             wordBank.appendChild(item);
-            
-            // Clear zone styling
             const parentZone = item.parentElement;
             if (parentZone && parentZone.classList.contains('drop-zone')) {
                 parentZone.classList.remove('filled', 'bg-green-100', 'border-green-500', 'bg-red-100', 'border-red-500');
             }
         }
 
-        // --- Rhyme Line Drawing (Orthogonal Lines) ---
+        // --- IMPROVED RHYME LINES (Curved & Underneath) ---
         function drawRhymeLines() {
             const svg = document.getElementById('svg-lines');
             if (!svg) return;
@@ -1254,10 +830,8 @@
             
             const container = document.getElementById('poem-container');
             if (!container) return;
-            
             const containerRect = container.getBoundingClientRect();
             
-            // Set SVG size to match container
             svg.style.width = container.offsetWidth + 'px';
             svg.style.height = container.offsetHeight + 'px';
 
@@ -1266,100 +840,56 @@
             const el2_6 = document.getElementById('slot-2-6');
             const el3_5 = document.getElementById('slot-3-5');
 
-            // --- Line 1: slot-1-5 → slot-2-3 (Horizontal arrow) ---
-            if (el1_5 && el2_3) {
-                const rect1 = el1_5.getBoundingClientRect();
-                const rect2 = el2_3.getBoundingClientRect();
+            // Draw line function (Curved under)
+            const drawCurve = (el1, el2) => {
+                if (!el1 || !el2) return;
+                const r1 = el1.getBoundingClientRect();
+                const r2 = el2.getBoundingClientRect();
 
-                // Start from right edge of slot-1-5
-                const x1 = rect1.right - containerRect.left;
-                const y1 = rect1.top + rect1.height / 2 - containerRect.top;
+                // Start from bottom-center of Source
+                const x1 = r1.left + r1.width/2 - containerRect.left;
+                const y1 = r1.bottom - containerRect.top;
+
+                // End at bottom-center of Target
+                const x2 = r2.left + r2.width/2 - containerRect.left;
+                const y2 = r2.bottom - containerRect.top;
+
+                // Control points for Bezier Curve (Dip down)
+                const cpY = Math.max(y1, y2) + 40; // Dip 40px below the lowest point
                 
-                // End at left edge of slot-2-3
-                const x2 = rect2.left - containerRect.left;
-                const y2 = rect2.top + rect2.height / 2 - containerRect.top;
-
-                // Draw horizontal line with slight curve down then to target
-                const midX = x1 + 15;
                 const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                const d = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+                // M startX startY Q controlX controlY endX endY
+                const d = `M ${x1} ${y1} Q ${(x1+x2)/2} ${cpY} ${x2} ${y2}`;
+                
                 path.setAttribute("d", d);
-                path.setAttribute("stroke", "#E91E63");
-                path.setAttribute("stroke-width", "2");
+                path.setAttribute("stroke", "rgba(233, 30, 99, 0.6)"); // Semi-transparent pink
+                path.setAttribute("stroke-width", "3");
                 path.setAttribute("fill", "none");
-                path.setAttribute("stroke-dasharray", "5,3");
+                path.setAttribute("stroke-dasharray", "4,2");
                 svg.appendChild(path);
 
-                // Arrow head at end
-                const arrowSize = 6;
-                const arrow = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-                arrow.setAttribute("points", `${x2},${y2} ${x2-arrowSize},${y2-arrowSize/2} ${x2-arrowSize},${y2+arrowSize/2}`);
-                arrow.setAttribute("fill", "#E91E63");
-                svg.appendChild(arrow);
+                // Dots at endpoints
+                [ {x:x1, y:y1}, {x:x2, y:y2} ].forEach(p => {
+                    const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    c.setAttribute("cx", p.x); c.setAttribute("cy", p.y);
+                    c.setAttribute("r", "3"); c.setAttribute("fill", "#E91E63");
+                    svg.appendChild(c);
+                });
+            };
 
-                // Circle at start
-                const circle1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle1.setAttribute("cx", x1);
-                circle1.setAttribute("cy", y1);
-                circle1.setAttribute("r", "4");
-                circle1.setAttribute("fill", "#E91E63");
-                svg.appendChild(circle1);
-            }
-
-            // --- Line 2: slot-2-6 → slot-3-5 (Down then left) ---
-            if (el2_6 && el3_5) {
-                const rect1 = el2_6.getBoundingClientRect();
-                const rect2 = el3_5.getBoundingClientRect();
-
-                // Start from bottom edge of slot-2-6
-                const x1 = rect1.left + rect1.width / 2 - containerRect.left;
-                const y1 = rect1.bottom - containerRect.top;
-                
-                // End at right edge of slot-3-5
-                const x2 = rect2.right - containerRect.left;
-                const y2 = rect2.top + rect2.height / 2 - containerRect.top;
-
-                // Draw: down, then horizontal to target
-                const turnY = y2; // Turn at the same Y level as target
-                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                const d = `M ${x1} ${y1} L ${x1} ${turnY} L ${x2} ${turnY}`;
-                path.setAttribute("d", d);
-                path.setAttribute("stroke", "#E91E63");
-                path.setAttribute("stroke-width", "2");
-                path.setAttribute("fill", "none");
-                path.setAttribute("stroke-dasharray", "5,3");
-                svg.appendChild(path);
-
-                // Arrow head at end (pointing left)
-                const arrowSize = 6;
-                const arrow = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-                arrow.setAttribute("points", `${x2},${y2} ${x2+arrowSize},${y2-arrowSize/2} ${x2+arrowSize},${y2+arrowSize/2}`);
-                arrow.setAttribute("fill", "#E91E63");
-                svg.appendChild(arrow);
-
-                // Circle at start
-                const circle1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle1.setAttribute("cx", x1);
-                circle1.setAttribute("cy", y1);
-                circle1.setAttribute("r", "4");
-                circle1.setAttribute("fill", "#E91E63");
-                svg.appendChild(circle1);
-            }
+            drawCurve(el1_5, el2_3);
+            drawCurve(el2_6, el3_5);
         }
 
         // --- Check Answer ---
         function checkAnswer(showAlert = true) {
             const dropZones = document.querySelectorAll('.drop-zone');
             let correctCount = 0;
-
             dropZones.forEach(zone => {
                 zone.classList.remove('bg-red-100', 'border-red-500', 'bg-green-100', 'border-green-500');
-                
                 if (zone.children.length > 0) {
-                    const wordEl = zone.children[0];
-                    const placedWord = wordEl.innerText.trim();
+                    const placedWord = zone.children[0].innerText.trim();
                     const targetWord = zone.dataset.target.trim();
-                    
                     if (placedWord === targetWord) {
                         correctCount++;
                         zone.classList.add('bg-green-100', 'border-green-500');
@@ -1368,78 +898,55 @@
                     }
                 }
             });
-
             if (showAlert) {
                 const total = dropZones.length;
-                if (correctCount === total) {
-                    Swal.fire({ icon: 'success', title: 'ยอดเยี่ยม!', text: 'ถูกต้องทั้งหมดครับ (กดปุ่มส่งคำตอบเพื่อจบเกม)' });
-                } else {
-                    Swal.fire({ icon: 'info', title: 'ผลการตรวจ', text: `ถูกต้อง ${correctCount} จาก ${total} คำ` });
-                }
+                if (correctCount === total) Swal.fire({ icon: 'success', title: 'ยอดเยี่ยม!', text: 'ถูกต้องทั้งหมดครับ (กดปุ่มส่งคำตอบเพื่อจบเกม)' });
+                else Swal.fire({ icon: 'info', title: 'ผลการตรวจ', text: `ถูกต้อง ${correctCount} จาก ${total} คำ` });
             }
             return correctCount;
         }
 
-        // --- Submit Game ---
         function submitGame() {
             const dropZones = document.querySelectorAll('.drop-zone');
             const emptyZones = Array.from(dropZones).filter(z => z.children.length === 0);
-            
             if (emptyZones.length > 0) {
                 Swal.fire({
-                    title: 'ยังเติมคำไม่ครบ',
-                    text: "คุณต้องการส่งคำตอบทั้งที่ยังไม่เสร็จหรือไม่?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'ส่งเลย',
-                    cancelButtonText: 'ทำต่อ'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        finalizeGame();
-                    }
-                });
-            } else {
-                finalizeGame();
-            }
+                    title: 'ยังเติมคำไม่ครบ', text: "คุณต้องการส่งคำตอบทั้งที่ยังไม่เสร็จหรือไม่?",
+                    icon: 'warning', showCancelButton: true, confirmButtonText: 'ส่งเลย', cancelButtonText: 'ทำต่อ'
+                }).then((result) => { if (result.isConfirmed) finalizeGame(); });
+            } else finalizeGame();
         }
 
         function finalizeGame() {
             clearInterval(gameState.timerInterval);
-            
-            // Play submit/winner sound
             playSound('sound-submit');
-
             const dropZones = document.querySelectorAll('.drop-zone');
             let correctCount = checkAnswer(false);
             let total = dropZones.length;
-
             const accuracyScore = Math.round((correctCount / total) * 80);
             const timePenalty = Math.min(20, Math.floor(gameState.elapsedSeconds / 15));
             const timeBonus = Math.max(0, 20 - timePenalty);
             const finalScore = accuracyScore + timeBonus;
-
             showResult(finalScore, correctCount, total);
-            saveToSheet(finalScore);
+            
+            // Only save if not a guest
+            if (!gameState.isGuest) {
+                saveToSheet(finalScore);
+            }
         }
 
         function showResult(score, correct, total) {
             document.getElementById('page-game').classList.add('hidden');
             document.getElementById('page-result').classList.remove('hidden');
-            
             document.getElementById('result-name').innerText = `ผู้เล่น: ${gameState.player.firstname} ${gameState.player.lastname}`;
             document.getElementById('final-score').innerText = score;
-            
             const mins = Math.floor(gameState.elapsedSeconds / 60);
             const secs = gameState.elapsedSeconds % 60;
             document.getElementById('final-time').innerText = `เวลาที่ใช้: ${mins} นาที ${secs} วินาที`;
-
-            // Display correct answer
-            document.getElementById('correct-answer-display').innerHTML = 
-                gameState.currentPoem.displayText.replace(/\n/g, '<br>');
-
+            document.getElementById('correct-answer-display').innerHTML = gameState.currentPoem.displayText.replace(/\n/g, '<br>');
+            
             const analysisEl = document.getElementById('analysis-text');
             const suggestEl = document.getElementById('suggestion-text');
-
             if (score >= 80) {
                 analysisEl.innerText = "ยอดเยี่ยมมาก! มีความเข้าใจฉันทลักษณ์แม่นยำ";
                 suggestEl.innerText = "ลองฝึกแต่งบทประพันธ์ด้วยตัวเองดูนะ!";
@@ -1453,7 +960,6 @@
             }
         }
 
-        // --- Google Sheet Connection ---
         function saveToSheet(score) {
             const data = {
                 timestamp: new Date().toISOString(),
@@ -1462,15 +968,11 @@
                 score: score,
                 time: gameState.elapsedSeconds
             };
-
             fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
+                method: 'POST', mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
-            }).then(() => {
-                console.log("Score saved successfully");
-            }).catch(err => console.error("Error saving score:", err));
+            }).then(() => console.log("Score saved")).catch(err => console.error("Error saving:", err));
         }
     </script>
 </body>
