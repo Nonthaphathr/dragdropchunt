@@ -274,6 +274,18 @@
 
     </div>
 
+    <div id="visitor-badge" class="fixed bottom-2 left-2 md:bottom-4 md:left-4 z-50 flex items-center gap-2 bg-white/90 backdrop-blur-sm p-2 md:p-3 rounded-full shadow-lg border-2 border-gold transform transition-all duration-1000 translate-y-20 opacity-0 pointer-events-none">
+        <div class="bg-gradient-to-br from-yellow-400 to-yellow-600 text-white w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+        </div>
+        <div class="flex flex-col pr-2">
+            <span class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-wider">ผู้เข้าชม</span>
+            <span id="visit-count" class="text-sm md:text-lg font-bold text-brown-main font-mono leading-none">กำลังโหลด...</span>
+        </div>
+    </div>
     <div id="quiz-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full border-4 border-purple-400 transform scale-100 transition-transform">
             <h3 class="text-xl font-bold text-purple-700 text-center mb-2">🎁 คำถามชิงสิทธิ์เปิดไพ่!</h3>
@@ -427,6 +439,50 @@
                  checkResumeGame();
              }
         };
+
+        // --- 📊 VISITOR COUNTER SYSTEM (ADDED) ---
+        document.addEventListener("DOMContentLoaded", () => {
+            // Namespace สำหรับนับ (ถ้าต้องการรีเซ็ตใหม่ให้เปลี่ยนชื่อนี้)
+            const NAMESPACE = 'game-indravichian-non-counter-v1'; 
+            const KEY = 'visit';
+            const API_URL = `https://api.counterapi.com/v1/${NAMESPACE}/${KEY}/up`;
+
+            const badge = document.getElementById('visitor-badge');
+            const countEl = document.getElementById('visit-count');
+
+            // ดึงข้อมูลและนับ
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(data => {
+                    // แสดงป้าย (Slide up)
+                    badge.classList.remove('translate-y-20', 'opacity-0');
+                    badge.classList.add('translate-y-0', 'opacity-100');
+                    
+                    // เรียกฟังก์ชันทำตัวเลขวิ่ง
+                    animateValue(countEl, 0, data.count, 2000);
+                })
+                .catch(err => {
+                    console.error("Counter Error:", err);
+                    countEl.innerText = "N/A";
+                    badge.classList.remove('translate-y-20', 'opacity-0');
+                });
+        });
+
+        // ฟังก์ชัน Animation ตัวเลขวิ่ง
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+        // --- END VISITOR COUNTER ---
+
 
         function startGuestGame() {
             gameState.isGuest = true;
