@@ -15,6 +15,7 @@
     <audio id="sound-submit" preload="auto"><source src="https://nonthaphathr.github.io/uploadimg/yehwinner.mp3" type="audio/mpeg"></audio>
     <audio id="sound-replay" preload="auto"><source src="https://nonthaphathr.github.io/uploadimg/replay.mp3" type="audio/mpeg"></audio>
     <audio id="sound-fail" preload="auto"><source src="https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3" type="audio/mpeg"></audio>
+    <audio id="sound-shuffle" preload="auto"><source src="https://www.myinstants.com/media/sounds/card-shuffle.mp3" type="audio/mpeg"></audio>
 
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #fdfcf0; }
@@ -28,8 +29,13 @@
         .bg-gold { background: linear-gradient(135deg, #D4AF37 0%, #C5A028 100%); }
         .text-gold { color: #D4AF37; }
 
-        /* Verse Layout */
-        .verse-row { display: flex; flex-wrap: nowrap; justify-content: center; gap: 6px; margin-bottom: 2.5rem; overflow-x: auto; padding: 4px 0; }
+        /* Verse Layout - Fixed Overflow for Labels */
+        .verse-row { 
+            display: flex; flex-wrap: nowrap; justify-content: center; gap: 6px; 
+            margin-bottom: 2rem; overflow-x: auto; 
+            padding-top: 2.5rem; /* Increased padding for labels */
+            padding-bottom: 4px;
+        }
         .verse-group { flex-shrink: 0; position: relative; }
 
         /* Drop Zone */
@@ -43,7 +49,7 @@
         
         @media (min-width: 640px) {
             .drop-zone { width: 3.5rem; height: 3rem; font-size: 1rem; }
-            .verse-row { gap: 14px; margin-bottom: 3rem; }
+            .verse-row { gap: 14px; margin-bottom: 2.5rem; }
         }
         @media (min-width: 768px) {
             .drop-zone { width: 4rem; height: 3.2rem; font-size: 1.1rem; }
@@ -52,25 +58,32 @@
         .drop-zone.hovered { background-color: #ffe0b2 !important; border-color: #ff9800 !important; transform: scale(1.08); }
         .drop-zone.filled { background-color: #fff8e1; border-style: solid; }
         
-        /* Rhyme Label Above Box */
+        /* Rhyme Label Above Box - Fixed Positioning */
         .rhyme-label {
             position: absolute;
-            bottom: 110%; /* Place above the box */
+            bottom: 100%; /* Above the box */
             left: 50%;
             transform: translateX(-50%);
             white-space: nowrap;
             font-size: 0.6rem;
-            background-color: #FFF8E1;
-            border: 1px solid #FFD54F;
-            padding: 2px 6px;
-            border-radius: 10px;
+            background-color: #FFF3E0;
+            border: 1px solid #FFB74D;
+            padding: 2px 8px;
+            border-radius: 12px;
             color: #E65100;
             font-weight: bold;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 20;
+            margin-bottom: 8px; /* Spacing from box */
             pointer-events: none;
         }
-        @media (min-width: 768px) { .rhyme-label { font-size: 0.75rem; padding: 3px 8px; } }
+        /* Triangle indicator for label */
+        .rhyme-label::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -4px;
+            border-width: 4px; border-style: solid; border-color: #FFB74D transparent transparent transparent;
+        }
+
+        @media (min-width: 768px) { .rhyme-label { font-size: 0.75rem; padding: 3px 10px; } }
 
         /* Word Card */
         .word-card {
@@ -85,7 +98,7 @@
 
         .fade-in { animation: fadeIn 0.5s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-overlay { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); }
         
         /* Floating Button */
         .floating-aid-btn { position: fixed; right: 10px; top: 50%; transform: translateY(-50%); z-index: 50; transition: all 0.3s ease; }
@@ -94,22 +107,44 @@
         /* Flash Reveal */
         #flash-reveal-overlay { z-index: 9999; background: rgba(255, 255, 255, 0.98); }
 
-        /* CARD FLIP STYLES */
+        /* CARD SYSTEM STYLES */
         .perspective-1000 { perspective: 1000px; }
+        .card-container {
+            width: 100%; height: 180px; position: relative;
+            transition: transform 0.5s ease-in-out;
+        }
         .card-inner {
             position: relative; width: 100%; height: 100%; text-align: center;
             transition: transform 0.6s; transform-style: preserve-3d;
             cursor: pointer;
         }
-        .card-container.flipped .card-inner { transform: rotateY(180deg); }
+        /* Class to flip */
+        .card-inner.flipped { transform: rotateY(180deg); }
+
         .card-front, .card-back {
             position: absolute; width: 100%; height: 100%;
             -webkit-backface-visibility: hidden; backface-visibility: hidden;
-            border-radius: 1rem; display: flex; align-items: center; justify-content: center; flex-col;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .card-front { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #fff; }
-        .card-back { background-color: white; transform: rotateY(180deg); border: 2px solid #D4AF37; }
+        
+        /* Front = Reward Face (Initially visible or revealed) */
+        .card-front { transform: rotateY(180deg); padding: 10px; border: 4px solid #fff; }
+        
+        /* Back = Pattern (Visible when closed) */
+        .card-back { 
+            background: linear-gradient(45deg, #1f2937 25%, #111827 25%, #111827 50%, #1f2937 50%, #1f2937 75%, #111827 75%, #111827 100%);
+            background-size: 20px 20px;
+            color: #D4AF37; border: 4px solid #D4AF37; 
+        }
+
+        /* Shuffle Animation */
+        @keyframes shuffleMove {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.8) translateY(0); }
+            100% { transform: scale(1); }
+        }
+        .shuffling { animation: shuffleMove 0.5s ease-in-out; }
 
         /* Timer Bar */
         .timer-bar-container { width: 100%; height: 6px; background: #eee; border-radius: 3px; margin-bottom: 10px; overflow: hidden; }
@@ -292,11 +327,12 @@
 
     <div id="card-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl p-4 md:p-6 max-w-2xl w-full border-4 border-gold">
-            <h3 class="text-xl md:text-2xl font-bold text-brown-main text-center mb-4">🃏 เลือกไพ่ 1 ใบเสี่ยงดวง!</h3>
-            <p class="text-center text-gray-500 mb-6 text-sm">ระวัง! อาจมีตัวช่วย "ซ้ำเติม" ซ่อนอยู่</p>
+            <h3 class="text-xl md:text-2xl font-bold text-brown-main text-center mb-4">🃏 จำตำแหน่งให้ดี!</h3>
             
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="card-grid">
                 </div>
+
+            <div id="card-status-text" class="text-center mt-4 font-bold text-red-500 animate-pulse">กำลังจำ...</div>
         </div>
     </div>
 
@@ -364,9 +400,10 @@
             currentPoem: null,
             allWords: [],
             quizTriggered: {}, 
-            bonusTime: 0, // In seconds (Positive = Bad/Penalty add to time, Negative = Good/Reduce time)
+            bonusTime: 0,
             isGuest: false,
-            quizTimerInterval: null
+            quizTimerInterval: null,
+            cardRewards: [] // Temporary storage for current shuffle
         };
 
         function playSound(soundId) {
@@ -433,16 +470,15 @@
                     dropZone.dataset.target = syllable.word;
                     dropZone.dataset.type = syllable.type;
                     
-                    // RHYME LABELS (Replaces Lines)
+                    // RHYME LABELS - FIXED
                     if (syllable.rhyme) {
                         const label = document.createElement('div');
                         label.className = 'rhyme-label fade-in';
                         
-                        // Custom text logic for labels
-                        if (syllable.rhyme === 'send1') label.innerText = "ส่งสัมผัส ➡️ วรรค 2";
-                        else if (syllable.rhyme === 'recv1') label.innerText = "⬅️ รับสัมผัส";
-                        else if (syllable.rhyme === 'send2') label.innerText = "ส่งสัมผัส ➡️ วรรค 4";
-                        else if (syllable.rhyme === 'recv2') label.innerText = "⬅️ รับสัมผัส";
+                        if (syllable.rhyme === 'send1') label.innerText = "ส่ง ➡️ วรรค 2";
+                        else if (syllable.rhyme === 'recv1') label.innerText = "⬅️ รับ";
+                        else if (syllable.rhyme === 'send2') label.innerText = "ส่ง ➡️ วรรค 4";
+                        else if (syllable.rhyme === 'recv2') label.innerText = "⬅️ รับ";
                         
                         verseGroup.appendChild(label);
                     }
@@ -491,20 +527,13 @@
             gameState.startTime = Date.now();
             gameState.timerInterval = setInterval(() => {
                 const rawSeconds = Math.floor((Date.now() - gameState.startTime) / 1000);
-                
-                // Effective time = Real time passed - Bonus (Time deducted)
-                // Note: If bonusTime is positive (Penalty), effective time increases. 
-                // We want "Help = Reduce time", so 'addBonusTime(30)' should make bonusTime = 30
-                // Calculation: Time = raw - bonus. 
                 let displaySeconds = Math.max(0, rawSeconds - gameState.bonusTime);
-                
                 gameState.elapsedSeconds = displaySeconds;
 
                 const minutes = Math.floor(displaySeconds / 60).toString().padStart(2, '0');
                 const seconds = (displaySeconds % 60).toString().padStart(2, '0');
                 document.getElementById('timer').innerText = `${minutes}:${seconds}`;
 
-                // Trigger quiz every 2 mins of REAL play time
                 const minuteMark = Math.floor(rawSeconds / 120);
                 if (rawSeconds > 0 && rawSeconds % 120 === 0 && !gameState.quizTriggered[minuteMark]) {
                     gameState.quizTriggered[minuteMark] = true;
@@ -536,18 +565,15 @@
 
             modal.classList.remove('hidden');
 
-            // Start 3.5s Countdown
             timerBar.style.width = '100%';
-            let timeLeft = 3500; // ms
+            let timeLeft = 3500;
             const interval = 100;
-            
             if (gameState.quizTimerInterval) clearInterval(gameState.quizTimerInterval);
             
             gameState.quizTimerInterval = setInterval(() => {
                 timeLeft -= interval;
                 const percent = (timeLeft / 3500) * 100;
                 timerBar.style.width = `${percent}%`;
-
                 if (timeLeft <= 0) {
                     clearInterval(gameState.quizTimerInterval);
                     modal.classList.add('hidden');
@@ -571,61 +597,107 @@
             }
         }
 
-        // --- CARD SYSTEM (Replaces Roulette) ---
+        // --- CARD SYSTEM REFACTORED (Reveal -> Shuffle -> Pick) ---
         function showCardModal() {
             document.getElementById('card-modal').classList.remove('hidden');
+            document.getElementById('card-status-text').innerText = "จำตำแหน่งให้ดี! (3 วินาที)";
+            document.getElementById('card-status-text').classList.remove('text-green-500');
+            document.getElementById('card-status-text').classList.add('text-red-500');
+
             const grid = document.getElementById('card-grid');
             grid.innerHTML = '';
             
-            // Generate 4 cards
-            for(let i=0; i<4; i++) {
+            // 1. Prepare Rewards
+            const rewards = [
+                { emoji: '🤖', text: 'ช่วยจัด 3 คำ', color: 'bg-gradient-to-br from-blue-400 to-blue-600', action: 'autofill' },
+                { emoji: '⚡', text: 'เปิดเฉลย 1 วิ', color: 'bg-gradient-to-br from-yellow-400 to-yellow-600', action: 'flash' },
+                { emoji: '⏰', text: 'ลดเวลา 30 วิ', color: 'bg-gradient-to-br from-green-400 to-green-600', action: 'addtime' },
+                { emoji: '😈', text: 'สลับคำมั่ว!', color: 'bg-gradient-to-br from-red-600 to-red-800', action: 'shuffle' }
+            ];
+            
+            // Shuffle initial positions
+            gameState.cardRewards = rewards.sort(() => Math.random() - 0.5);
+
+            // 2. Generate Cards (FACE UP - flipped class added)
+            gameState.cardRewards.forEach((reward, index) => {
                 const card = document.createElement('div');
-                card.className = 'h-40 perspective-1000 card-container';
+                card.className = 'card-container';
+                card.id = `card-slot-${index}`;
+                
+                // Add click handler (initially disabled by pointer-events below)
                 card.innerHTML = `
-                    <div class="card-inner" onclick="flipCard(this)">
-                        <div class="card-back rounded-xl flex flex-col items-center justify-center bg-white border-4 border-gold cursor-pointer hover:shadow-xl transition">
+                    <div class="card-inner flipped" id="card-inner-${index}">
+                        <div class="card-back rounded-xl flex flex-col items-center justify-center cursor-pointer hover:shadow-xl transition">
                             <span class="text-4xl">🃏</span>
                             <span class="text-xs font-bold text-brown-main mt-2">แตะเพื่อเปิด</span>
                         </div>
-                        <div class="card-front rounded-xl flex flex-col items-center justify-center">
-                            </div>
+                        <div class="card-front rounded-xl flex flex-col items-center justify-center ${reward.color} text-white border-2 border-white">
+                            <div class="text-4xl mb-2 drop-shadow-md">${reward.emoji}</div>
+                            <div class="font-bold text-lg drop-shadow-md text-center leading-tight">${reward.text}</div>
+                        </div>
                     </div>
                 `;
                 grid.appendChild(card);
-            }
+            });
+
+            // Disable clicks initially
+            grid.style.pointerEvents = 'none';
+
+            // 3. Sequence: Wait 3s -> Flip Down -> Shuffle -> Enable
+            setTimeout(() => {
+                // Flip Down
+                document.querySelectorAll('.card-inner').forEach(c => c.classList.remove('flipped'));
+                
+                setTimeout(() => {
+                    // Start Shuffle Animation
+                    playSound('sound-shuffle');
+                    document.getElementById('card-status-text').innerText = "กำลังสับไพ่...";
+                    document.querySelectorAll('.card-container').forEach(c => c.classList.add('shuffling'));
+                    
+                    // Logic Shuffle (Swap rewards behind scenes)
+                    setTimeout(() => {
+                        gameState.cardRewards = gameState.cardRewards.sort(() => Math.random() - 0.5);
+                        
+                        // Update DOM content to match new shuffled order (while hidden)
+                        gameState.cardRewards.forEach((reward, index) => {
+                            const frontFace = document.querySelector(`#card-inner-${index} .card-front`);
+                            // Remove old color classes
+                            frontFace.className = `card-front rounded-xl flex flex-col items-center justify-center ${reward.color} text-white border-2 border-white`;
+                            frontFace.innerHTML = `
+                                <div class="text-4xl mb-2 drop-shadow-md">${reward.emoji}</div>
+                                <div class="font-bold text-lg drop-shadow-md text-center leading-tight">${reward.text}</div>
+                            `;
+                            // Attach new click event (via closure index)
+                            const cardInner = document.getElementById(`card-inner-${index}`);
+                            cardInner.onclick = () => selectCard(index);
+                        });
+
+                        document.querySelectorAll('.card-container').forEach(c => c.classList.remove('shuffling'));
+                        
+                        // Enable Picking
+                        grid.style.pointerEvents = 'auto';
+                        document.getElementById('card-status-text').innerText = "เชิญเลือกได้เลย!";
+                        document.getElementById('card-status-text').classList.remove('text-red-500');
+                        document.getElementById('card-status-text').classList.add('text-green-600');
+                    }, 500); // Wait for shuffle animation mid-point
+                }, 600); // Wait for flip down animation
+            }, 3000); // Show time
         }
 
-        function flipCard(cardInner) {
-            if (cardInner.parentElement.classList.contains('flipped')) return; // Prevent double click
+        function selectCard(index) {
+            const cardInner = document.getElementById(`card-inner-${index}`);
+            if (cardInner.classList.contains('flipped')) return;
             
-            // Reveal Logic
-            const rewards = [
-                { emoji: '🤖', text: 'ช่วยจัด 3 คำ', color: 'from-blue-400 to-blue-600', action: 'autofill' },
-                { emoji: '⚡', text: 'เปิดเฉลย 1 วิ', color: 'from-yellow-400 to-yellow-600', action: 'flash' },
-                { emoji: '⏰', text: 'ลดเวลา 30 วิ', color: 'from-green-400 to-green-600', action: 'addtime' },
-                { emoji: '😈', text: 'สลับคำมั่ว!', color: 'from-red-500 to-red-700', action: 'shuffle' } // Penalty
-            ];
-            
-            // Random reward
-            const result = rewards[Math.floor(Math.random() * rewards.length)];
-            
-            const front = cardInner.querySelector('.card-front');
-            front.className = `card-front bg-gradient-to-br ${result.color} text-white border-2 border-white`;
-            front.innerHTML = `
-                <div class="text-4xl mb-2">${result.emoji}</div>
-                <div class="font-bold text-lg">${result.text}</div>
-            `;
-            
-            cardInner.parentElement.classList.add('flipped');
+            cardInner.classList.add('flipped');
+            const reward = gameState.cardRewards[index];
             
             // Disable other cards
             document.querySelectorAll('.card-container').forEach(c => c.style.pointerEvents = 'none');
 
-            // Wait then execute
             setTimeout(() => {
                 document.getElementById('card-modal').classList.add('hidden');
                 document.getElementById('special-aid-container').classList.add('hidden');
-                executeCardResult(result.action);
+                executeCardResult(reward.action);
             }, 1500);
         }
 
@@ -633,7 +705,7 @@
             switch(action) {
                 case 'autofill': autoFillWords(3); break;
                 case 'flash': flashReveal(); break;
-                case 'addtime': addBonusTime(30); break; // Good: Reduce elapsed time
+                case 'addtime': addBonusTime(30); break;
                 case 'shuffle': 
                     playSound('sound-fail');
                     Swal.fire({ 
@@ -642,9 +714,7 @@
                         title: 'อุ๊ยยยยย!', 
                         text: 'ผู้ช่วย...ซ้ำเติม เสียใจด้วยน้าา', 
                         confirmButtonText: 'ยอมรับชะตากรรม' 
-                    }).then(() => {
-                         shuffleCorrectWords(3);
-                    });
+                    }).then(() => { shuffleCorrectWords(3); });
                     break;
             }
         }
@@ -673,7 +743,6 @@
         }
 
         function addBonusTime(seconds) {
-            // Logic: Reducing elapsed time (Improving score)
             gameState.bonusTime += seconds; 
             Swal.fire({ icon: 'success', title: `ลดเวลาให้ ${seconds} วินาที!`, text: 'เวลาเดินถอยหลังเพื่อช่วยคุณ', timer: 1500, showConfirmButton: false });
         }
@@ -861,7 +930,6 @@
             let correctCount = checkAnswer(false);
             let total = dropZones.length;
             const accuracyScore = Math.round((correctCount / total) * 80);
-            // Don't punish time if negative elapsed (due to bonuses)
             const effectiveTime = Math.max(0, gameState.elapsedSeconds);
             const timePenalty = Math.min(20, Math.floor(effectiveTime / 15));
             const timeBonus = Math.max(0, 20 - timePenalty);
@@ -902,11 +970,7 @@
             playSound('sound-replay');
             const overlay = document.getElementById('exit-overlay');
             overlay.classList.add('active');
-            
-            // Wait 3.5 seconds before reload
-            setTimeout(() => {
-                location.reload();
-            }, 3500);
+            setTimeout(() => { location.reload(); }, 3500);
         }
 
         function saveToSheet(score) {
