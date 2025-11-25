@@ -29,7 +29,6 @@
         .drop-zone {
             transition: all 0.3s ease;
             position: relative;
-            /* ปรับขนาดให้ยืดหยุ่นขึ้นรองรับคำยาว */
             min-width: 3.5rem; 
             min-height: 3rem;
         }
@@ -49,8 +48,8 @@
             touch-action: none;
             user-select: none;
             transition: transform 0.2s, box-shadow 0.2s;
-            /* ปรับขนาดตัวอักษรให้พอดีคำว่า จารย์ */
             font-size: 1rem; 
+            z-index: 10; /* Ensure draggable is above */
         }
         @media (min-width: 768px) {
             .word-card { font-size: 1.125rem; }
@@ -79,8 +78,21 @@
 
         /* Modal Styles */
         .modal-overlay {
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(4px);
+        }
+
+        /* Floating Button Style */
+        .floating-aid-btn {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+        .floating-aid-btn:hover {
+            transform: translateY(-50%) scale(1.1);
         }
 
         /* Flash Reveal Container */
@@ -131,7 +143,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-gray-700 mb-1 text-sm">ชื่อจริง (ไม่ต้องใส่คำนำหน้า)</label>
+                        <label class="block text-gray-700 mb-1 text-sm">ชื่อจริง</label>
                         <input type="text" id="firstname" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none" required>
                     </div>
                     <div>
@@ -155,16 +167,18 @@
                     <span id="player-name-display">ผู้เล่น: ...</span>
                 </div>
                 
-                <div id="special-aid-container" class="hidden">
-                    <button onclick="showAidMenu()" class="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow animate-bounce">
-                        ✨ ตัวช่วยพิเศษ
-                    </button>
-                </div>
-
                 <div class="flex items-center gap-2">
                     <span class="text-gray-600 text-sm">⏱️ เวลา:</span>
                     <span id="timer" class="font-mono font-bold text-lg md:text-xl text-red-600">00:00</span>
                 </div>
+            </div>
+
+            <div id="special-aid-container" class="hidden floating-aid-btn">
+                <button onclick="showAidMenu()" class="flex flex-col items-center justify-center bg-gradient-to-r from-purple-500 to-pink-600 text-white w-20 h-20 md:w-24 md:h-24 rounded-full shadow-2xl border-4 border-white animate-bounce hover:animate-none group">
+                    <span class="text-2xl md:text-3xl mb-1 group-hover:scale-110 transition">🎁</span>
+                    <span class="text-[10px] md:text-xs font-bold leading-none">ตัวช่วย</span>
+                    <span class="text-[10px] md:text-xs font-bold leading-none">พิเศษ!</span>
+                </button>
             </div>
 
             <div class="p-2 md:p-6 relative flex-grow">
@@ -259,7 +273,7 @@
 
     </div>
 
-    <div id="quiz-modal" class="fixed inset-0 z-50 hidden modal-overlay flex items-center justify-center p-4">
+    <div id="quiz-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full border-4 border-purple-400 transform scale-100 transition-transform">
             <h3 class="text-xl font-bold text-purple-700 text-center mb-4">🎁 คำถามชิงตัวช่วย!</h3>
             <p class="text-center mb-6 text-lg">ข้อใดเป็น <span class="text-red-500 font-bold">"ลหุ"</span> ?</p>
@@ -269,10 +283,10 @@
         </div>
     </div>
 
-    <div id="aid-menu-modal" class="fixed inset-0 z-50 hidden modal-overlay flex items-center justify-center p-4">
+    <div id="aid-menu-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full">
             <h3 class="text-xl font-bold text-gray-800 text-center mb-4">เลือกตัวช่วย 1 อย่าง</h3>
-            <p class="text-center text-sm text-gray-500 mb-4">(เลือกได้เพียงครั้งเดียวเท่านั้น)</p>
+            <p class="text-center text-sm text-gray-500 mb-4">(ใช้แล้วปุ่มจะหายไปในการใช้ครั้งนี้)</p>
             
             <div class="space-y-3">
                 <button onclick="useAid('autofill')" class="w-full bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-3 px-4 rounded-lg flex items-center gap-3 transition">
@@ -287,7 +301,7 @@
     </div>
 
     <div id="flash-reveal-overlay" class="fixed inset-0 hidden flex items-center justify-center">
-        <div class="text-4xl md:text-6xl font-bold text-brown-main text-center bg-white p-10 rounded-xl shadow-2xl border-8 border-gold">
+        <div class="text-2xl md:text-5xl font-bold text-brown-main text-center bg-white p-6 md:p-10 rounded-xl shadow-2xl border-8 border-gold m-4">
             <div class="leading-loose">
                 ควรสุดจะสมเพช<br>
                 จิตระเวททนาการ<br>
@@ -308,8 +322,6 @@
             timerInterval: null,
             elapsedSeconds: 0,
             selectedWord: null,
-            aidUsed: false,
-            specialQuizInterval: null,
             level1Words: [
                 "ควร", "สุด", "จะ", "สม", "เพช",
                 "จิ", "ตระ", "เวท", "ท", "นา", "การ",
@@ -336,13 +348,12 @@
 
             setupLevel1();
             startTimer();
-            startSpecialQuizTimer(); // Start the 3-minute loop
             
             setTimeout(drawRhymeLines, 500);
             window.addEventListener('resize', drawRhymeLines);
         }
 
-        // --- Timer Logic ---
+        // --- Timer Logic & Special Events ---
         function startTimer() {
             gameState.startTime = Date.now();
             gameState.timerInterval = setInterval(() => {
@@ -350,19 +361,17 @@
                 const minutes = Math.floor(gameState.elapsedSeconds / 60).toString().padStart(2, '0');
                 const seconds = (gameState.elapsedSeconds % 60).toString().padStart(2, '0');
                 document.getElementById('timer').innerText = `${minutes}:${seconds}`;
+
+                // --- Special Quiz Trigger ---
+                // Trigger at 2:30 (150s) and 4:30 (270s)
+                if (gameState.elapsedSeconds === 150 || gameState.elapsedSeconds === 270) {
+                     showSpecialQuiz();
+                }
+
             }, 1000);
         }
 
         // --- Special Quiz Logic ---
-        function startSpecialQuizTimer() {
-            // Trigger every 3 minutes (180,000 ms)
-            gameState.specialQuizInterval = setInterval(() => {
-                if(!document.getElementById('page-game').classList.contains('hidden') && !gameState.aidUsed) {
-                    showSpecialQuiz();
-                }
-            }, 180000); 
-        }
-
         function showSpecialQuiz() {
             const modal = document.getElementById('quiz-modal');
             const optionsContainer = document.getElementById('quiz-options');
@@ -422,9 +431,8 @@
 
         function useAid(type) {
             document.getElementById('aid-menu-modal').classList.add('hidden');
-            document.getElementById('special-aid-container').classList.add('hidden');
-            gameState.aidUsed = true; // One time use
-
+            document.getElementById('special-aid-container').classList.add('hidden'); // Hide button after use
+            
             if (type === 'autofill') {
                 autoFillWords(3);
             } else if (type === 'flash') {
@@ -445,6 +453,7 @@
                 // Find word in bank
                 const wordBank = document.getElementById('word-bank');
                 const words = Array.from(wordBank.children);
+                // Look for word that is NOT hidden
                 const matchingWord = words.find(w => w.innerText.trim() === targetText && !w.classList.contains('invisible'));
 
                 if (matchingWord) {
@@ -491,9 +500,11 @@
             });
         }
 
-        // --- Drag & Drop / Tap Logic ---
+        // --- Drag & Drop / Tap Logic (Improved) ---
         function dragStart(e) {
             e.dataTransfer.setData('text/plain', e.target.id);
+            // Don't fully hide, just opacity reduce so we can see what we are dragging, 
+            // but styling handles 'invisible' class for source
             setTimeout(() => e.target.classList.add('invisible'), 0);
             selectWord(e.target);
         }
@@ -517,7 +528,17 @@
             zone.classList.remove('hovered');
             const id = e.dataTransfer.getData('text/plain');
             const draggable = document.getElementById(id);
-            if (zone && draggable) moveWordToZone(draggable, zone);
+            
+            if (zone && draggable) {
+                // *** FIX: If zone has a word, return it to bank first ***
+                if (zone.hasChildNodes()) {
+                    const existingItem = zone.firstChild;
+                    const wordBank = document.getElementById('word-bank');
+                    wordBank.appendChild(existingItem);
+                    existingItem.classList.remove('invisible'); // Ensure it's visible
+                }
+                moveWordToZone(draggable, zone);
+            }
         }
 
         function selectWord(el) {
@@ -531,24 +552,26 @@
         }
 
         function placeSelectedWord(zone) {
-            if (gameState.selectedWord && !zone.hasChildNodes()) {
+            if (gameState.selectedWord) {
+                // *** FIX: If zone has a word, return it to bank first ***
+                if (zone.hasChildNodes()) {
+                     const existingItem = zone.firstChild;
+                     const wordBank = document.getElementById('word-bank');
+                     wordBank.appendChild(existingItem);
+                     existingItem.classList.remove('invisible');
+                }
+
                 moveWordToZone(gameState.selectedWord, zone);
                 gameState.selectedWord.classList.remove('selected');
                 gameState.selectedWord = null;
-            } else if (zone.hasChildNodes() && gameState.selectedWord) {
-                // Swap: Move existing back to bank
-                const existing = zone.firstElementChild;
-                document.getElementById('word-bank').appendChild(existing);
-                moveWordToZone(gameState.selectedWord, zone);
-                gameState.selectedWord.classList.remove('selected');
-                gameState.selectedWord = null;
-            }
+            } 
         }
 
         function moveWordToZone(item, zone) {
-            zone.innerHTML = '';
+            // zone.innerHTML = ''; // No longer need to clear simply, we handled swapping above
             zone.appendChild(item);
             zone.classList.add('filled');
+            item.classList.remove('invisible');
         }
 
         // --- Rhyme Line Drawing ---
@@ -601,12 +624,11 @@
             let correctCount = 0;
 
             dropZones.forEach(zone => {
-                // Reset styles
                 zone.classList.remove('bg-red-100', 'border-red-500', 'bg-green-100', 'border-green-500');
                 
                 if (zone.children.length > 0) {
                     const wordEl = zone.children[0];
-                    const placedWord = wordEl.innerText.trim(); // Trim whitespace
+                    const placedWord = wordEl.innerText.trim();
                     const targetWord = zone.dataset.target.trim();
                     
                     if (placedWord === targetWord) {
@@ -632,7 +654,6 @@
         // --- Submit Game (Finalize) ---
         function submitGame() {
             const dropZones = document.querySelectorAll('.drop-zone');
-            // Ensure all filled? Or allow partial submission? Let's verify completeness.
             const emptyZones = Array.from(dropZones).filter(z => z.children.length === 0);
             
             if (emptyZones.length > 0) {
@@ -655,13 +676,11 @@
 
         function finalizeGame() {
             clearInterval(gameState.timerInterval);
-            clearInterval(gameState.specialQuizInterval);
 
             const dropZones = document.querySelectorAll('.drop-zone');
-            let correctCount = checkAnswer(false); // Get count, update visual
+            let correctCount = checkAnswer(false);
             let total = dropZones.length;
 
-            // Score Calculation
             const accuracyScore = Math.round((correctCount / total) * 80);
             const timePenalty = Math.min(20, Math.floor(gameState.elapsedSeconds / 10));
             const timeBonus = Math.max(0, 20 - timePenalty);
