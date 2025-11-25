@@ -4,10 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เกมลากวางอินทรวิเชียรฉันท์ ๑๑ - ครูนนทพัทธ์</title>
+    <link rel="icon" type="image/png" href="https://nonthaphathr.github.io/uploadimg/logokhampraphan-non.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Audio Elements -->
+    <audio id="sound-start" preload="auto">
+        <source src="https://nonthaphathr.github.io/uploadimg/openlakwang.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-quiz" preload="auto">
+        <source src="https://nonthaphathr.github.io/uploadimg/tuachuay.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-submit" preload="auto">
+        <source src="https://nonthaphathr.github.io/uploadimg/yehwinner.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-replay" preload="auto">
+        <source src="https://nonthaphathr.github.io/uploadimg/replay.mp3" type="audio/mpeg">
+    </audio>
 
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #fdfcf0; }
@@ -263,6 +278,83 @@
             50% { transform: scale(1.1); }
             100% { transform: scale(1); opacity: 1; }
         }
+
+        /* ============ LOGO ANIMATION ============ */
+        .logo-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid #D4AF37;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            animation: logoFloat 3s ease-in-out infinite, logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        @media (min-width: 768px) {
+            .logo-img {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-5px) rotate(2deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(-3px) rotate(-2deg); }
+        }
+
+        @keyframes logoGlow {
+            0% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.4), 0 0 20px rgba(212, 175, 55, 0.2); }
+            100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.8), 0 0 40px rgba(212, 175, 55, 0.4), 0 0 60px rgba(212, 175, 55, 0.2); }
+        }
+
+        .logo-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px;
+            height: 90px;
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            border-radius: 50%;
+            animation: logoRingPulse 2s ease-out infinite;
+        }
+
+        @media (min-width: 768px) {
+            .logo-ring {
+                width: 110px;
+                height: 110px;
+            }
+        }
+
+        @keyframes logoRingPulse {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+
+        .logo-sparkle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #D4AF37;
+            border-radius: 50%;
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+
+        .logo-sparkle:nth-child(2) { top: 0; left: 50%; animation-delay: 0s; }
+        .logo-sparkle:nth-child(3) { top: 50%; right: 0; animation-delay: 0.3s; }
+        .logo-sparkle:nth-child(4) { bottom: 0; left: 50%; animation-delay: 0.6s; }
+        .logo-sparkle:nth-child(5) { top: 50%; left: 0; animation-delay: 0.9s; }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-2 md:p-4 relative overflow-x-hidden">
@@ -273,6 +365,19 @@
         
         <header class="bg-brown-main text-white p-3 md:p-6 text-center shadow-md relative">
             <div class="absolute top-0 left-0 w-full h-2 bg-gold"></div>
+            
+            <!-- Animated Logo -->
+            <div class="flex justify-center mb-3">
+                <div class="logo-container">
+                    <div class="logo-ring"></div>
+                    <span class="logo-sparkle"></span>
+                    <span class="logo-sparkle"></span>
+                    <span class="logo-sparkle"></span>
+                    <span class="logo-sparkle"></span>
+                    <img src="https://nonthaphathr.github.io/uploadimg/logokhampraphan-non.png" alt="Logo" class="logo-img">
+                </div>
+            </div>
+            
             <h1 class="text-lg md:text-3xl font-bold mb-1 md:mb-2 text-gold">เกมลากและวางสร้างอินทรวิเชียรฉันท์ ๑๑</h1>
             <p class="text-xs md:text-sm opacity-90">พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง</p>
         </header>
@@ -397,7 +502,7 @@
                 </div>
             </div>
 
-            <button onclick="location.reload()" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 mx-auto">
+            <button onclick="playSound('sound-replay'); setTimeout(() => location.reload(), 500);" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 mx-auto">
                 🔄 เล่นใหม่อีกครั้ง
             </button>
         </div>
@@ -593,9 +698,21 @@
             bonusTime: 0  // Extra time from roulette
         };
 
+        // --- Sound Functions ---
+        function playSound(soundId) {
+            const sound = document.getElementById(soundId);
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log('Audio play failed:', e));
+            }
+        }
+
         // --- Initialization ---
         function startGame(e) {
             e.preventDefault();
+            
+            // Play start sound
+            playSound('sound-start');
             
             gameState.player = {
                 prefix: document.getElementById('prefix').value,
@@ -737,6 +854,9 @@
 
         // --- Special Quiz Logic ---
         function showSpecialQuiz() {
+            // Play quiz sound
+            playSound('sound-quiz');
+            
             const modal = document.getElementById('quiz-modal');
             const optionsContainer = document.getElementById('quiz-options');
             optionsContainer.innerHTML = '';
@@ -803,19 +923,31 @@
             spinBtn.classList.add('opacity-50');
             wheel.classList.add('spinning-glow');
             
-            // Random result: 0=A, 1=B, 2=C, 3=D
+            // Random result: 0=A(Blue), 1=B(Yellow), 2=C(Green), 3=D(Red)
             const result = Math.floor(Math.random() * 4);
             
-            // Calculate rotation (3-5 full spins + landing position)
-            // Each segment is 90 degrees
-            // Result 0 (A) = stop at 315-45 degrees area (top)
-            // Result 1 (B) = stop at 45-135 degrees
-            // Result 2 (C) = stop at 135-225 degrees
-            // Result 3 (D) = stop at 225-315 degrees
+            /*
+             * conic-gradient starts from top (0deg) clockwise:
+             * - Blue (A): 0-90deg, center at 45deg
+             * - Yellow (B): 90-180deg, center at 135deg
+             * - Green (C): 180-270deg, center at 225deg
+             * - Red (D): 270-360deg, center at 315deg
+             * 
+             * To land on a segment, we rotate the wheel so that segment's center
+             * aligns with the pointer at top (0deg).
+             * 
+             * Rotation needed = 360 - center_angle (to bring center to top)
+             * - Blue: 360 - 45 = 315deg
+             * - Yellow: 360 - 135 = 225deg
+             * - Green: 360 - 225 = 135deg
+             * - Red: 360 - 315 = 45deg
+             */
+            const landingAngles = [315, 225, 135, 45]; // A, B, C, D
             
-            const baseSpins = 1080 + Math.floor(Math.random() * 720); // 3-5 spins
-            const segmentOffset = [337, 67, 157, 247]; // Center of each segment at top
-            const finalRotation = baseSpins + segmentOffset[result] + (Math.random() * 40 - 20);
+            // Base spins (3-5 full rotations) + landing angle + small variance
+            const baseSpins = 1080 + Math.floor(Math.random() * 720);
+            const variance = Math.random() * 30 - 15; // -15 to +15 degrees
+            const finalRotation = baseSpins + landingAngles[result] + variance;
             
             wheel.style.transform = `rotate(${finalRotation}deg)`;
             
@@ -1114,17 +1246,12 @@
             }
         }
 
-        // --- Rhyme Line Drawing ---
+        // --- Rhyme Line Drawing (Orthogonal Lines) ---
         function drawRhymeLines() {
             const svg = document.getElementById('svg-lines');
             if (!svg) return;
             svg.innerHTML = '';
             
-            const connections = [
-                { from: 'slot-1-5', to: 'slot-2-3', color: '#E91E63' },
-                { from: 'slot-2-6', to: 'slot-3-5', color: '#E91E63' }
-            ];
-
             const container = document.getElementById('poem-container');
             if (!container) return;
             
@@ -1134,44 +1261,90 @@
             svg.style.width = container.offsetWidth + 'px';
             svg.style.height = container.offsetHeight + 'px';
 
-            connections.forEach(conn => {
-                const el1 = document.getElementById(conn.from);
-                const el2 = document.getElementById(conn.to);
+            const el1_5 = document.getElementById('slot-1-5');
+            const el2_3 = document.getElementById('slot-2-3');
+            const el2_6 = document.getElementById('slot-2-6');
+            const el3_5 = document.getElementById('slot-3-5');
+
+            // --- Line 1: slot-1-5 → slot-2-3 (Horizontal arrow) ---
+            if (el1_5 && el2_3) {
+                const rect1 = el1_5.getBoundingClientRect();
+                const rect2 = el2_3.getBoundingClientRect();
+
+                // Start from right edge of slot-1-5
+                const x1 = rect1.right - containerRect.left;
+                const y1 = rect1.top + rect1.height / 2 - containerRect.top;
                 
-                if (el1 && el2) {
-                    const rect1 = el1.getBoundingClientRect();
-                    const rect2 = el2.getBoundingClientRect();
+                // End at left edge of slot-2-3
+                const x2 = rect2.left - containerRect.left;
+                const y2 = rect2.top + rect2.height / 2 - containerRect.top;
 
-                    // Calculate positions relative to container
-                    const x1 = rect1.left + rect1.width / 2 - containerRect.left;
-                    const y1 = rect1.top + rect1.height / 2 - containerRect.top;
-                    const x2 = rect2.left + rect2.width / 2 - containerRect.left;
-                    const y2 = rect2.top + rect2.height / 2 - containerRect.top;
+                // Draw horizontal line with slight curve down then to target
+                const midX = x1 + 15;
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                const d = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+                path.setAttribute("d", d);
+                path.setAttribute("stroke", "#E91E63");
+                path.setAttribute("stroke-width", "2");
+                path.setAttribute("fill", "none");
+                path.setAttribute("stroke-dasharray", "5,3");
+                svg.appendChild(path);
 
-                    // Draw curved line
-                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                    const controlX = Math.max(x1, x2) + 40;
-                    const controlY = (y1 + y2) / 2;
-                    const d = `M ${x1} ${y1} Q ${controlX} ${controlY} ${x2} ${y2}`;
-                    path.setAttribute("d", d);
-                    path.setAttribute("stroke", conn.color);
-                    path.setAttribute("stroke-width", "2");
-                    path.setAttribute("fill", "none");
-                    path.setAttribute("stroke-dasharray", "4,4");
-                    path.classList.add('fade-in');
-                    svg.appendChild(path);
+                // Arrow head at end
+                const arrowSize = 6;
+                const arrow = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                arrow.setAttribute("points", `${x2},${y2} ${x2-arrowSize},${y2-arrowSize/2} ${x2-arrowSize},${y2+arrowSize/2}`);
+                arrow.setAttribute("fill", "#E91E63");
+                svg.appendChild(arrow);
 
-                    // Draw circles at endpoints
-                    [{x:x1, y:y1}, {x:x2, y:y2}].forEach(pt => {
-                        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                        circle.setAttribute("cx", pt.x);
-                        circle.setAttribute("cy", pt.y);
-                        circle.setAttribute("r", "3");
-                        circle.setAttribute("fill", conn.color);
-                        svg.appendChild(circle);
-                    });
-                }
-            });
+                // Circle at start
+                const circle1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle1.setAttribute("cx", x1);
+                circle1.setAttribute("cy", y1);
+                circle1.setAttribute("r", "4");
+                circle1.setAttribute("fill", "#E91E63");
+                svg.appendChild(circle1);
+            }
+
+            // --- Line 2: slot-2-6 → slot-3-5 (Down then left) ---
+            if (el2_6 && el3_5) {
+                const rect1 = el2_6.getBoundingClientRect();
+                const rect2 = el3_5.getBoundingClientRect();
+
+                // Start from bottom edge of slot-2-6
+                const x1 = rect1.left + rect1.width / 2 - containerRect.left;
+                const y1 = rect1.bottom - containerRect.top;
+                
+                // End at right edge of slot-3-5
+                const x2 = rect2.right - containerRect.left;
+                const y2 = rect2.top + rect2.height / 2 - containerRect.top;
+
+                // Draw: down, then horizontal to target
+                const turnY = y2; // Turn at the same Y level as target
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                const d = `M ${x1} ${y1} L ${x1} ${turnY} L ${x2} ${turnY}`;
+                path.setAttribute("d", d);
+                path.setAttribute("stroke", "#E91E63");
+                path.setAttribute("stroke-width", "2");
+                path.setAttribute("fill", "none");
+                path.setAttribute("stroke-dasharray", "5,3");
+                svg.appendChild(path);
+
+                // Arrow head at end (pointing left)
+                const arrowSize = 6;
+                const arrow = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                arrow.setAttribute("points", `${x2},${y2} ${x2+arrowSize},${y2-arrowSize/2} ${x2+arrowSize},${y2+arrowSize/2}`);
+                arrow.setAttribute("fill", "#E91E63");
+                svg.appendChild(arrow);
+
+                // Circle at start
+                const circle1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle1.setAttribute("cx", x1);
+                circle1.setAttribute("cy", y1);
+                circle1.setAttribute("r", "4");
+                circle1.setAttribute("fill", "#E91E63");
+                svg.appendChild(circle1);
+            }
         }
 
         // --- Check Answer ---
@@ -1232,6 +1405,9 @@
 
         function finalizeGame() {
             clearInterval(gameState.timerInterval);
+            
+            // Play submit/winner sound
+            playSound('sound-submit');
 
             const dropZones = document.querySelectorAll('.drop-zone');
             let correctCount = checkAnswer(false);
