@@ -25,17 +25,56 @@
         .bg-gold { background: linear-gradient(135deg, #D4AF37 0%, #C5A028 100%); }
         .text-gold { color: #D4AF37; }
 
-        /* Game Box Styles */
+        /* ============ MOBILE-FIRST VERSE LAYOUT ============ */
+        .verse-row {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            padding: 4px 0;
+        }
+        
+        .verse-group {
+            flex-shrink: 0;
+        }
+
+        /* Drop Zone Styles - Smaller on mobile */
         .drop-zone {
             transition: all 0.3s ease;
             position: relative;
-            min-width: 3.5rem; 
-            min-height: 3rem;
+            width: 2.8rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
         }
+        
+        @media (min-width: 640px) {
+            .drop-zone {
+                width: 3.5rem;
+                height: 3rem;
+                font-size: 1rem;
+            }
+            .verse-row {
+                gap: 8px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .drop-zone {
+                width: 4rem;
+                height: 3.2rem;
+                font-size: 1.1rem;
+            }
+        }
+
         .drop-zone.hovered {
-            background-color: #ffe0b2;
-            border-color: #ff9800;
-            transform: scale(1.05);
+            background-color: #ffe0b2 !important;
+            border-color: #ff9800 !important;
+            transform: scale(1.08);
         }
         .drop-zone.filled {
             background-color: #fff8e1;
@@ -48,18 +87,36 @@
             touch-action: none;
             user-select: none;
             transition: transform 0.2s, box-shadow 0.2s;
-            font-size: 1rem; 
-            z-index: 10; /* Ensure draggable is above */
+            font-size: 0.9rem;
+            padding: 6px 10px;
+            z-index: 10;
         }
+        
+        @media (min-width: 640px) {
+            .word-card { 
+                font-size: 1rem; 
+                padding: 8px 14px;
+            }
+        }
+        
         @media (min-width: 768px) {
-            .word-card { font-size: 1.125rem; }
+            .word-card { 
+                font-size: 1.125rem; 
+                padding: 8px 16px;
+            }
         }
 
         .word-card:active { cursor: grabbing; transform: scale(1.1); }
         .word-card.selected {
-            ring: 4px solid #D4AF37;
-            background-color: #fff3cd;
-            transform: scale(1.1);
+            box-shadow: 0 0 0 3px #D4AF37;
+            background-color: #fff3cd !important;
+            transform: scale(1.08);
+        }
+        
+        .word-card.hidden-word {
+            visibility: hidden;
+            position: absolute;
+            pointer-events: none;
         }
 
         /* SVG Overlay for Rhymes */
@@ -85,12 +142,19 @@
         /* Floating Button Style */
         .floating-aid-btn {
             position: fixed;
-            right: 20px;
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
             z-index: 50;
             transition: all 0.3s ease;
         }
+        
+        @media (min-width: 768px) {
+            .floating-aid-btn {
+                right: 20px;
+            }
+        }
+        
         .floating-aid-btn:hover {
             transform: translateY(-50%) scale(1.1);
         }
@@ -98,7 +162,103 @@
         /* Flash Reveal Container */
         #flash-reveal-overlay {
             z-index: 9999;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        /* ============ ROULETTE STYLES ============ */
+        .roulette-container {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            margin: 0 auto;
+        }
+        
+        @media (min-width: 640px) {
+            .roulette-container {
+                width: 300px;
+                height: 300px;
+            }
+        }
+
+        .roulette-wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            border: 6px solid #5D4037;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+        }
+
+        .roulette-segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: bottom right;
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .roulette-segment span {
+            position: absolute;
+            top: 25%;
+            left: 25%;
+            transform: rotate(45deg);
+            font-size: 1.8rem;
+        }
+
+        .roulette-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #E91E63;
+            z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .roulette-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #D4AF37, #B8860B);
+            border-radius: 50%;
+            border: 4px solid #5D4037;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.8); }
+        }
+
+        .spinning-glow {
+            animation: pulse-glow 0.3s infinite;
+        }
+
+        /* Result Animation */
+        .result-reveal {
+            animation: resultPop 0.5s ease-out;
+        }
+
+        @keyframes resultPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
@@ -108,12 +268,13 @@
 
     <div class="w-full max-w-5xl bg-white rounded-2xl shadow-2xl border-4 border-gold overflow-hidden relative z-10 flex flex-col min-h-[90vh]">
         
-        <header class="bg-brown-main text-white p-4 md:p-6 text-center shadow-md relative">
+        <header class="bg-brown-main text-white p-3 md:p-6 text-center shadow-md relative">
             <div class="absolute top-0 left-0 w-full h-2 bg-gold"></div>
-            <h1 class="text-xl md:text-3xl font-bold mb-2 text-gold">เกมลากและวางสร้างอินทรวิเชียรฉันท์ ๑๑</h1>
+            <h1 class="text-lg md:text-3xl font-bold mb-1 md:mb-2 text-gold">เกมลากและวางสร้างอินทรวิเชียรฉันท์ ๑๑</h1>
             <p class="text-xs md:text-sm opacity-90">พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง</p>
         </header>
 
+        <!-- REGISTRATION PAGE -->
         <div id="page-register" class="p-4 md:p-8 fade-in flex-grow flex items-center justify-center">
             <div class="w-full max-w-md">
                 <h2 class="text-2xl font-bold text-brown-main mb-6 text-center border-b-2 border-gold pb-2 inline-block w-full">ลงทะเบียน</h2>
@@ -161,108 +322,75 @@
             </div>
         </div>
 
+        <!-- GAME PAGE -->
         <div id="page-game" class="hidden relative flex-grow flex flex-col">
             <div class="flex flex-wrap justify-between items-center bg-yellow-50 p-2 md:p-4 border-b border-gray-200 gap-2">
-                <div class="font-bold text-brown-main text-sm md:text-base">
+                <div class="font-bold text-brown-main text-xs md:text-base">
                     <span id="player-name-display">ผู้เล่น: ...</span>
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <span class="text-gray-600 text-sm">⏱️ เวลา:</span>
-                    <span id="timer" class="font-mono font-bold text-lg md:text-xl text-red-600">00:00</span>
+                    <span class="text-gray-600 text-xs md:text-sm">⏱️ เวลา:</span>
+                    <span id="timer" class="font-mono font-bold text-base md:text-xl text-red-600">00:00</span>
                 </div>
             </div>
 
+            <!-- SPECIAL AID BUTTON -->
             <div id="special-aid-container" class="hidden floating-aid-btn">
-                <button onclick="showAidMenu()" class="flex flex-col items-center justify-center bg-gradient-to-r from-purple-500 to-pink-600 text-white w-20 h-20 md:w-24 md:h-24 rounded-full shadow-2xl border-4 border-white animate-bounce hover:animate-none group">
-                    <span class="text-2xl md:text-3xl mb-1 group-hover:scale-110 transition">🎁</span>
-                    <span class="text-[10px] md:text-xs font-bold leading-none">ตัวช่วย</span>
-                    <span class="text-[10px] md:text-xs font-bold leading-none">พิเศษ!</span>
+                <button onclick="showRouletteModal()" class="flex flex-col items-center justify-center bg-gradient-to-r from-purple-500 to-pink-600 text-white w-16 h-16 md:w-24 md:h-24 rounded-full shadow-2xl border-4 border-white animate-bounce hover:animate-none group">
+                    <span class="text-xl md:text-3xl mb-0.5 group-hover:scale-110 transition">🎰</span>
+                    <span class="text-[8px] md:text-xs font-bold leading-none">หมุนวงล้อ</span>
+                    <span class="text-[8px] md:text-xs font-bold leading-none">ลุ้นรางวัล!</span>
                 </button>
             </div>
 
             <div class="p-2 md:p-6 relative flex-grow">
                 <svg id="svg-lines"></svg>
 
-                <h3 class="text-lg md:text-xl font-bold text-center text-brown-main mb-1">ข้อที่ 1 : จงเรียงคำให้ถูกต้องตามฉันทลักษณ์</h3>
-                <p class="text-center text-gray-500 text-xs mb-4">"คลิกที่คำ" แล้วนำไป "คลิกที่ช่องว่าง" หรือลากไปวาง</p>
+                <h3 class="text-base md:text-xl font-bold text-center text-brown-main mb-1">บทที่ <span id="poem-number">1</span> : จงเรียงคำให้ถูกต้องตามฉันทลักษณ์</h3>
+                <p class="text-center text-gray-500 text-xs mb-3">"คลิกที่คำ" แล้วนำไป "คลิกที่ช่องว่าง" หรือลากไปวาง</p>
 
                 <div class="bg-white p-2 md:p-4 rounded-xl border-2 border-dashed border-gray-300 relative z-10 max-w-4xl mx-auto" id="poem-container">
-                    
-                    <div class="flex flex-wrap justify-center gap-1 md:gap-2 mb-6 verse-row">
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="ควร" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="สุด" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="จะ" data-type="ลหุ"></div><div class="text-[10px] text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="สม" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" id="slot-1-5" data-target="เพช" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ (ส่ง)</div></div>
-                    </div>
-
-                    <div class="flex flex-wrap justify-center gap-1 md:gap-2 mb-6 verse-row">
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="จิ" data-type="ลหุ"></div><div class="text-[10px] text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="ตระ" data-type="ลหุ"></div><div class="text-[10px] text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" id="slot-2-3" data-target="เวท" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ (รับ)</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="ท" data-type="ลหุ"></div><div class="text-[10px] text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="นา" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" id="slot-2-6" data-target="การ" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ (ส่ง)</div></div>
-                    </div>
-
-                    <div class="flex flex-wrap justify-center gap-1 md:gap-2 mb-6 verse-row">
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="ที่" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="ท่าน" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="พฤ" data-type="ลหุ"></div><div class="text-[10px] text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="ฒา" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" id="slot-3-5" data-target="จารย์" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ (รับ)</div></div>
-                    </div>
-
-                    <div class="flex flex-wrap justify-center gap-1 md:gap-2 mb-2 verse-row">
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="พะ" data-type="ลหุ"></div><div class="text-[10px] text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="กระ" data-type="ลหุ"></div><div class="text-[10px] text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="ทบ" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="ประ" data-type="ลหุ"></div><div class="text-[10px] text-center mt-1 text-red-500 font-bold">ลหุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="สบ" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
-                        <div class="verse-group"><div class="drop-zone bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center p-1" data-target="ทัณฑ์" data-type="ครุ"></div><div class="text-[10px] text-center mt-1 text-blue-600 font-bold">ครุ</div></div>
-                    </div>
-
+                    <!-- Dynamic content will be generated here -->
                 </div>
 
-                <div class="mt-6 md:mt-8">
-                    <h4 class="text-center font-bold text-gray-700 mb-2">คลังคำศัพท์ (ลาก หรือ คลิก)</h4>
-                    <div id="word-bank" class="flex flex-wrap justify-center gap-2 md:gap-3 p-4 bg-yellow-100 rounded-xl min-h-[120px]">
-                        </div>
+                <div class="mt-4 md:mt-8">
+                    <h4 class="text-center font-bold text-gray-700 mb-2 text-sm md:text-base">คลังคำศัพท์ (ลาก หรือ คลิก)</h4>
+                    <div id="word-bank" class="flex flex-wrap justify-center gap-1.5 md:gap-3 p-3 md:p-4 bg-yellow-100 rounded-xl min-h-[100px]">
+                    </div>
                 </div>
 
-                <div class="mt-6 flex flex-col md:flex-row justify-center items-center gap-4 pb-4">
-                    <button onclick="checkAnswer(false)" class="w-full md:w-auto bg-blue-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-blue-600 transition transform hover:scale-105 border-2 border-blue-400">
+                <div class="mt-4 md:mt-6 flex flex-col md:flex-row justify-center items-center gap-3 pb-4">
+                    <button onclick="checkAnswer(true)" class="w-full md:w-auto bg-blue-500 text-white font-bold py-2.5 md:py-3 px-6 md:px-8 rounded-full shadow-lg hover:bg-blue-600 transition transform hover:scale-105 border-2 border-blue-400 text-sm md:text-base">
                         🔍 ตรวจดูความถูกต้อง
                     </button>
-                    <button onclick="submitGame()" class="w-full md:w-auto bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-700 transition transform hover:scale-105 border-2 border-green-500 animate-pulse">
+                    <button onclick="submitGame()" class="w-full md:w-auto bg-green-600 text-white font-bold py-2.5 md:py-3 px-6 md:px-8 rounded-full shadow-lg hover:bg-green-700 transition transform hover:scale-105 border-2 border-green-500 animate-pulse text-sm md:text-base">
                         🚀 ส่งคำตอบ & จบเกม
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="page-result" class="hidden p-8 text-center fade-in flex-grow flex flex-col justify-center">
+        <!-- RESULT PAGE -->
+        <div id="page-result" class="hidden p-4 md:p-8 text-center fade-in flex-grow flex flex-col justify-center">
             
-            <h2 class="text-3xl font-bold text-brown-main mb-2">สรุปผลคะแนน</h2>
-            <p id="result-name" class="text-gray-600 mb-6">คุณ...</p>
+            <h2 class="text-2xl md:text-3xl font-bold text-brown-main mb-2">สรุปผลคะแนน</h2>
+            <p id="result-name" class="text-gray-600 mb-4 md:mb-6">คุณ...</p>
 
-            <div class="bg-yellow-50 p-6 rounded-xl border border-gold mb-6 inline-block w-full max-w-sm mx-auto">
-                <div class="text-5xl font-bold text-gold mb-2" id="final-score">0</div>
+            <div class="bg-yellow-50 p-4 md:p-6 rounded-xl border border-gold mb-4 md:mb-6 inline-block w-full max-w-sm mx-auto">
+                <div class="text-4xl md:text-5xl font-bold text-gold mb-2" id="final-score">0</div>
                 <div class="text-gray-500">คะแนนรวม</div>
                 <div class="text-sm text-gray-400 mt-2" id="final-time">เวลาที่ใช้: -</div>
             </div>
 
-            <div class="text-left bg-white p-4 rounded-lg shadow-inner mb-6 text-sm md:text-base max-w-2xl mx-auto w-full">
+            <div class="text-left bg-white p-4 rounded-lg shadow-inner mb-4 md:mb-6 text-sm md:text-base max-w-2xl mx-auto w-full">
                 <p><strong>📊 ผลการวิเคราะห์:</strong> <span id="analysis-text" class="text-brown-main">...</span></p>
                 <p class="mt-2"><strong>💡 ข้อเสนอแนะ:</strong> <span id="suggestion-text" class="text-gray-600">...</span></p>
             </div>
 
-            <div class="bg-green-50 p-4 rounded-lg border border-green-200 mb-6 max-w-2xl mx-auto w-full">
+            <div class="bg-green-50 p-4 rounded-lg border border-green-200 mb-4 md:mb-6 max-w-2xl mx-auto w-full">
                 <h3 class="font-bold text-green-800 mb-2">✅ เฉลยที่ถูกต้อง:</h3>
-                <div class="text-lg text-brown-main font-serif leading-relaxed">
-                    ควรสุดจะสมเพช &nbsp;&nbsp; จิตระเวททนาการ<br>
-                    ที่ท่านพฤฒาจารย์ &nbsp;&nbsp; พะกระทบประสบทัณฑ์
+                <div id="correct-answer-display" class="text-base md:text-lg text-brown-main font-serif leading-relaxed">
                 </div>
             </div>
 
@@ -273,47 +401,192 @@
 
     </div>
 
+    <!-- QUIZ MODAL -->
     <div id="quiz-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full border-4 border-purple-400 transform scale-100 transition-transform">
-            <h3 class="text-xl font-bold text-purple-700 text-center mb-4">🎁 คำถามชิงตัวช่วย!</h3>
-            <p class="text-center mb-6 text-lg">ข้อใดเป็น <span class="text-red-500 font-bold">"ลหุ"</span> ?</p>
+            <h3 class="text-xl font-bold text-purple-700 text-center mb-4">🎁 คำถามชิงสิทธิ์หมุนวงล้อ!</h3>
+            <p class="text-center mb-6 text-lg" id="quiz-question">ข้อใดเป็น <span class="text-red-500 font-bold">"ลหุ"</span> ?</p>
             
             <div class="grid grid-cols-2 gap-4" id="quiz-options">
-                </div>
+            </div>
         </div>
     </div>
 
-    <div id="aid-menu-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full">
-            <h3 class="text-xl font-bold text-gray-800 text-center mb-4">เลือกตัวช่วย 1 อย่าง</h3>
-            <p class="text-center text-sm text-gray-500 mb-4">(ใช้แล้วปุ่มจะหายไปในการใช้ครั้งนี้)</p>
+    <!-- ROULETTE MODAL -->
+    <div id="roulette-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl p-4 md:p-6 max-w-md w-full border-4 border-gold">
+            <h3 class="text-xl md:text-2xl font-bold text-brown-main text-center mb-4">🎰 หมุนวงล้อลุ้นตัวช่วย!</h3>
             
-            <div class="space-y-3">
-                <button onclick="useAid('autofill')" class="w-full bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-3 px-4 rounded-lg flex items-center gap-3 transition">
-                    🤖 1. ช่วยจัดคำลงช่อง 3 คำ
-                </button>
-                <button onclick="useAid('flash')" class="w-full bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-bold py-3 px-4 rounded-lg flex items-center gap-3 transition">
-                    ⚡ 2. เปิดเฉลย 1 วินาที
-                </button>
+            <div class="roulette-container">
+                <div class="roulette-pointer"></div>
+                <div class="roulette-wheel" id="roulette-wheel">
+                    <!-- Segment A: ช่วยจัดคำ 3 คำ (Blue) -->
+                    <div class="roulette-segment" style="background: #3B82F6; transform: rotate(0deg);">
+                        <span>🤖</span>
+                    </div>
+                    <!-- Segment B: เปิดเฉลย 1 วินาที (Yellow) -->
+                    <div class="roulette-segment" style="background: #F59E0B; transform: rotate(90deg);">
+                        <span>⚡</span>
+                    </div>
+                    <!-- Segment C: เพิ่มเวลา 30 วินาที (Green) -->
+                    <div class="roulette-segment" style="background: #10B981; transform: rotate(180deg);">
+                        <span>⏰</span>
+                    </div>
+                    <!-- Segment D: สลับตำแหน่ง 3 คำ (Red) -->
+                    <div class="roulette-segment" style="background: #EF4444; transform: rotate(270deg);">
+                        <span>🔀</span>
+                    </div>
+                </div>
+                <div class="roulette-center">🎲</div>
             </div>
-            <button onclick="document.getElementById('aid-menu-modal').classList.add('hidden')" class="mt-4 w-full text-gray-500 text-sm underline">ปิด</button>
+
+            <div class="mt-4 grid grid-cols-2 gap-2 text-xs md:text-sm">
+                <div class="flex items-center gap-1"><span class="w-4 h-4 bg-blue-500 rounded"></span> ช่วยจัด 3 คำ</div>
+                <div class="flex items-center gap-1"><span class="w-4 h-4 bg-yellow-500 rounded"></span> เปิดเฉลย 1 วิ</div>
+                <div class="flex items-center gap-1"><span class="w-4 h-4 bg-green-500 rounded"></span> เพิ่มเวลา 30 วิ</div>
+                <div class="flex items-center gap-1"><span class="w-4 h-4 bg-red-500 rounded"></span> สลับ 3 คำ</div>
+            </div>
+
+            <button onclick="spinRoulette()" id="spin-btn" class="mt-4 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition text-lg">
+                🎲 หมุนเลย!
+            </button>
+            
+            <div id="roulette-result" class="hidden mt-4 p-4 rounded-lg text-center">
+            </div>
         </div>
     </div>
 
+    <!-- FLASH REVEAL OVERLAY -->
     <div id="flash-reveal-overlay" class="fixed inset-0 hidden flex items-center justify-center">
-        <div class="text-2xl md:text-5xl font-bold text-brown-main text-center bg-white p-6 md:p-10 rounded-xl shadow-2xl border-8 border-gold m-4">
-            <div class="leading-loose">
-                ควรสุดจะสมเพช<br>
-                จิตระเวททนาการ<br>
-                ที่ท่านพฤฒาจารย์<br>
-                พะกระทบประสบทัณฑ์
-            </div>
+        <div id="flash-answer-content" class="text-xl md:text-4xl font-bold text-brown-main text-center bg-white p-4 md:p-10 rounded-xl shadow-2xl border-8 border-gold m-4 leading-loose">
         </div>
     </div>
 
     <script>
         // --- Configuration ---
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3ek50qmc39njmYK0HRiWq_GXpclneLZdhW5FR-iLbdjWuieHbVrMO0BHnq78d8KQHNQ/exec';
+
+        // --- POEM DATA (3 poems to randomize) ---
+        const POEMS_DATA = [
+            {
+                id: 1,
+                displayText: "เนื่องนับอเนกแนว\nระยะแถวตลอดลาย\nเฆี่ยนครบสยบกาย\nศิระพับพะกับคา",
+                verses: [
+                    // Verse 1 (5 syllables)
+                    [
+                        { word: "เนื่อง", type: "ครุ" },
+                        { word: "นับ", type: "ครุ" },
+                        { word: "อ", type: "ลหุ" },
+                        { word: "เนก", type: "ครุ" },
+                        { word: "แนว", type: "ครุ", rhyme: "send1" }
+                    ],
+                    // Verse 2 (6 syllables)
+                    [
+                        { word: "ระ", type: "ลหุ" },
+                        { word: "ยะ", type: "ลหุ" },
+                        { word: "แถว", type: "ครุ", rhyme: "recv1" },
+                        { word: "ต", type: "ลหุ" },
+                        { word: "ลอด", type: "ครุ" },
+                        { word: "ลาย", type: "ครุ", rhyme: "send2" }
+                    ],
+                    // Verse 3 (5 syllables)
+                    [
+                        { word: "เฆี่ยน", type: "ครุ" },
+                        { word: "ครบ", type: "ครุ" },
+                        { word: "ส", type: "ลหุ" },
+                        { word: "ยบ", type: "ครุ" },
+                        { word: "กาย", type: "ครุ", rhyme: "recv2" }
+                    ],
+                    // Verse 4 (6 syllables)
+                    [
+                        { word: "ศิ", type: "ลหุ" },
+                        { word: "ระ", type: "ลหุ" },
+                        { word: "พับ", type: "ครุ" },
+                        { word: "พะ", type: "ลหุ" },
+                        { word: "กับ", type: "ครุ" },
+                        { word: "คา", type: "ครุ" }
+                    ]
+                ],
+                lahuPool: ["อ", "ระ", "ยะ", "ต", "ส", "ศิ", "พะ"],
+                kruPool: ["เนื่อง", "นับ", "เนก", "แนว", "แถว", "ลอด", "ลาย", "เฆี่ยน", "ครบ", "ยบ", "กาย", "พับ", "กับ", "คา"]
+            },
+            {
+                id: 2,
+                displayText: "สุขนักมิน้อยเลย\nขณะเฉยมิสนใด\nก่นด่าจะจากใคร\nก็บ่รับประทับจำ",
+                verses: [
+                    [
+                        { word: "สุข", type: "ครุ" },
+                        { word: "นัก", type: "ครุ" },
+                        { word: "มิ", type: "ลหุ" },
+                        { word: "น้อย", type: "ครุ" },
+                        { word: "เลย", type: "ครุ", rhyme: "send1" }
+                    ],
+                    [
+                        { word: "ข", type: "ลหุ" },
+                        { word: "ณะ", type: "ลหุ" },
+                        { word: "เฉย", type: "ครุ", rhyme: "recv1" },
+                        { word: "มิ", type: "ลหุ" },
+                        { word: "สน", type: "ครุ" },
+                        { word: "ใด", type: "ครุ", rhyme: "send2" }
+                    ],
+                    [
+                        { word: "ก่น", type: "ครุ" },
+                        { word: "ด่า", type: "ครุ" },
+                        { word: "จะ", type: "ลหุ" },
+                        { word: "จาก", type: "ครุ" },
+                        { word: "ใคร", type: "ครุ", rhyme: "recv2" }
+                    ],
+                    [
+                        { word: "ก็", type: "ลหุ" },
+                        { word: "บ่", type: "ลหุ" },
+                        { word: "รับ", type: "ครุ" },
+                        { word: "ประ", type: "ลหุ" },
+                        { word: "ทับ", type: "ครุ" },
+                        { word: "จำ", type: "ครุ" }
+                    ]
+                ],
+                lahuPool: ["มิ", "ข", "ณะ", "จะ", "ก็", "บ่", "ประ"],
+                kruPool: ["สุข", "นัก", "น้อย", "เลย", "เฉย", "สน", "ใด", "ก่น", "ด่า", "จาก", "ใคร", "รับ", "ทับ", "จำ"]
+            },
+            {
+                id: 3,
+                displayText: "ชีวิตสิโปร่งเบา\nสละเขลามิสุมกอง\nปล่อยวาง ณ ครรลอง\nฤดิโล่งสบายเลย",
+                verses: [
+                    [
+                        { word: "ชี", type: "ครุ" },
+                        { word: "วิต", type: "ครุ" },
+                        { word: "สิ", type: "ลหุ" },
+                        { word: "โปร่ง", type: "ครุ" },
+                        { word: "เบา", type: "ครุ", rhyme: "send1" }
+                    ],
+                    [
+                        { word: "ส", type: "ลหุ" },
+                        { word: "ละ", type: "ลหุ" },
+                        { word: "เขลา", type: "ครุ", rhyme: "recv1" },
+                        { word: "มิ", type: "ลหุ" },
+                        { word: "สุม", type: "ครุ" },
+                        { word: "กอง", type: "ครุ", rhyme: "send2" }
+                    ],
+                    [
+                        { word: "ปล่อย", type: "ครุ" },
+                        { word: "วาง", type: "ครุ" },
+                        { word: "ณ", type: "ลหุ" },
+                        { word: "ครร", type: "ครุ" },
+                        { word: "ลอง", type: "ครุ", rhyme: "recv2" }
+                    ],
+                    [
+                        { word: "ฤ", type: "ลหุ" },
+                        { word: "ดิ", type: "ลหุ" },
+                        { word: "โล่ง", type: "ครุ" },
+                        { word: "ส", type: "ลหุ" },
+                        { word: "บาย", type: "ครุ" },
+                        { word: "เลย", type: "ครุ" }
+                    ]
+                ],
+                lahuPool: ["สิ", "ส", "ละ", "มิ", "ณ", "ฤ", "ดิ"],
+                kruPool: ["ชี", "วิต", "โปร่ง", "เบา", "เขลา", "สุม", "กอง", "ปล่อย", "วาง", "ครร", "ลอง", "โล่ง", "บาย", "เลย"]
+            }
+        ];
 
         // --- Game State ---
         let gameState = {
@@ -322,12 +595,10 @@
             timerInterval: null,
             elapsedSeconds: 0,
             selectedWord: null,
-            level1Words: [
-                "ควร", "สุด", "จะ", "สม", "เพช",
-                "จิ", "ตระ", "เวท", "ท", "นา", "การ",
-                "ที่", "ท่าน", "พฤ", "ฒา", "จารย์",
-                "พะ", "กระ", "ทบ", "ประ", "สบ", "ทัณฑ์"
-            ]
+            currentPoem: null,
+            allWords: [],
+            quizTriggered: {},  // Track which minute marks have triggered
+            bonusTime: 0  // Extra time from roulette
         };
 
         // --- Initialization ---
@@ -346,26 +617,124 @@
             document.getElementById('page-game').classList.remove('hidden');
             document.getElementById('player-name-display').innerText = `ผู้เล่น: ${gameState.player.firstname} ${gameState.player.level}`;
 
-            setupLevel1();
+            // Randomly select a poem
+            const randomIndex = Math.floor(Math.random() * POEMS_DATA.length);
+            gameState.currentPoem = POEMS_DATA[randomIndex];
+            document.getElementById('poem-number').innerText = gameState.currentPoem.id;
+
+            setupPoemUI();
             startTimer();
             
             setTimeout(drawRhymeLines, 500);
             window.addEventListener('resize', drawRhymeLines);
         }
 
+        // --- Dynamic Poem UI Generation ---
+        function setupPoemUI() {
+            const container = document.getElementById('poem-container');
+            container.innerHTML = '';
+            
+            const poem = gameState.currentPoem;
+            gameState.allWords = [];
+
+            poem.verses.forEach((verse, verseIndex) => {
+                const verseRow = document.createElement('div');
+                verseRow.className = 'verse-row';
+
+                verse.forEach((syllable, syllableIndex) => {
+                    gameState.allWords.push(syllable.word);
+                    
+                    const verseGroup = document.createElement('div');
+                    verseGroup.className = 'verse-group';
+                    
+                    const dropZone = document.createElement('div');
+                    dropZone.className = 'drop-zone bg-gray-100 rounded-lg border-2 border-gray-300';
+                    dropZone.dataset.target = syllable.word;
+                    dropZone.dataset.type = syllable.type;
+                    
+                    // Set IDs for rhyme connections
+                    if (syllable.rhyme === 'send1') {
+                        dropZone.id = 'slot-1-5';
+                    } else if (syllable.rhyme === 'recv1') {
+                        dropZone.id = 'slot-2-3';
+                    } else if (syllable.rhyme === 'send2') {
+                        dropZone.id = 'slot-2-6';
+                    } else if (syllable.rhyme === 'recv2') {
+                        dropZone.id = 'slot-3-5';
+                    }
+
+                    const typeLabel = document.createElement('div');
+                    typeLabel.className = `text-[9px] md:text-[10px] text-center mt-0.5 font-bold ${syllable.type === 'ครุ' ? 'text-blue-600' : 'text-red-500'}`;
+                    
+                    let labelText = syllable.type;
+                    if (syllable.rhyme) {
+                        labelText += syllable.rhyme.includes('send') ? ' (ส่ง)' : ' (รับ)';
+                    }
+                    typeLabel.innerText = labelText;
+
+                    verseGroup.appendChild(dropZone);
+                    verseGroup.appendChild(typeLabel);
+                    verseRow.appendChild(verseGroup);
+                });
+
+                container.appendChild(verseRow);
+            });
+
+            // Setup word bank
+            setupWordBank();
+            
+            // Add event listeners to drop zones
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.addEventListener('dragover', dragOver);
+                zone.addEventListener('dragleave', dragLeave);
+                zone.addEventListener('drop', drop);
+                zone.addEventListener('click', () => placeSelectedWord(zone));
+            });
+        }
+
+        function setupWordBank() {
+            const wordBank = document.getElementById('word-bank');
+            wordBank.innerHTML = '';
+            
+            const shuffledWords = [...gameState.allWords].sort(() => Math.random() - 0.5);
+
+            shuffledWords.forEach((word, index) => {
+                const el = document.createElement('div');
+                el.className = 'word-card bg-white border border-yellow-400 shadow-md rounded-lg font-bold text-brown-main';
+                el.innerText = word;
+                el.draggable = true;
+                el.id = `word-${word}-${index}-${Date.now()}`;
+                
+                el.addEventListener('dragstart', dragStart);
+                el.addEventListener('dragend', dragEnd);
+                el.addEventListener('click', () => selectWord(el));
+                
+                // Touch events for mobile
+                el.addEventListener('touchstart', touchStart, { passive: false });
+                el.addEventListener('touchmove', touchMove, { passive: false });
+                el.addEventListener('touchend', touchEnd);
+                
+                wordBank.appendChild(el);
+            });
+        }
+
         // --- Timer Logic & Special Events ---
         function startTimer() {
             gameState.startTime = Date.now();
             gameState.timerInterval = setInterval(() => {
-                gameState.elapsedSeconds = Math.floor((Date.now() - gameState.startTime) / 1000);
-                const minutes = Math.floor(gameState.elapsedSeconds / 60).toString().padStart(2, '0');
-                const seconds = (gameState.elapsedSeconds % 60).toString().padStart(2, '0');
+                const rawSeconds = Math.floor((Date.now() - gameState.startTime) / 1000);
+                gameState.elapsedSeconds = Math.max(0, rawSeconds - gameState.bonusTime);
+                
+                const displaySeconds = rawSeconds;
+                const minutes = Math.floor(displaySeconds / 60).toString().padStart(2, '0');
+                const seconds = (displaySeconds % 60).toString().padStart(2, '0');
                 document.getElementById('timer').innerText = `${minutes}:${seconds}`;
 
-                // --- Special Quiz Trigger ---
-                // Trigger at 2:30 (150s) and 4:30 (270s)
-                if (gameState.elapsedSeconds === 150 || gameState.elapsedSeconds === 270) {
-                     showSpecialQuiz();
+                // Trigger quiz every 2 minutes (120s, 240s, 360s, etc.)
+                const minuteMark = Math.floor(displaySeconds / 120);
+                if (displaySeconds > 0 && displaySeconds % 120 === 0 && !gameState.quizTriggered[minuteMark]) {
+                    gameState.quizTriggered[minuteMark] = true;
+                    showSpecialQuiz();
                 }
 
             }, 1000);
@@ -377,12 +746,9 @@
             const optionsContainer = document.getElementById('quiz-options');
             optionsContainer.innerHTML = '';
 
-            // Generate Question: 1 Lahu, 1 Kru
-            const lahuPool = ["จะ", "จิ", "ตระ", "ท", "พฤ", "พะ", "กระ", "ประ"];
-            const kruPool = ["ควร", "สุด", "สม", "เพช", "เวท", "นา", "การ", "จารย์"];
-            
-            const correctWord = lahuPool[Math.floor(Math.random() * lahuPool.length)];
-            const wrongWord = kruPool[Math.floor(Math.random() * kruPool.length)];
+            const poem = gameState.currentPoem;
+            const correctWord = poem.lahuPool[Math.floor(Math.random() * poem.lahuPool.length)];
+            const wrongWord = poem.kruPool[Math.floor(Math.random() * poem.kruPool.length)];
 
             const options = [
                 { word: correctWord, isCorrect: true },
@@ -408,7 +774,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'ถูกต้อง!',
-                    text: 'คุณได้รับสิทธิ์ตัวช่วยพิเศษ',
+                    text: 'คุณได้รับสิทธิ์หมุนวงล้อลุ้นตัวช่วย!',
                     timer: 2000,
                     showConfirmButton: false
                 });
@@ -417,200 +783,384 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'ผิดครับ',
-                    text: 'น่าเสียดาย ลองใหม่รอบหน้านะครับ',
+                    text: 'น่าเสียดาย รอโอกาสหน้านะครับ',
                     timer: 2000,
                     showConfirmButton: false
                 });
             }
         }
 
-        // --- Special Aid Logic ---
-        function showAidMenu() {
-            document.getElementById('aid-menu-modal').classList.remove('hidden');
+        // --- ROULETTE SYSTEM ---
+        function showRouletteModal() {
+            document.getElementById('roulette-modal').classList.remove('hidden');
+            document.getElementById('roulette-result').classList.add('hidden');
+            document.getElementById('spin-btn').disabled = false;
+            document.getElementById('spin-btn').classList.remove('opacity-50');
+            document.getElementById('roulette-wheel').style.transform = 'rotate(0deg)';
         }
 
-        function useAid(type) {
-            document.getElementById('aid-menu-modal').classList.add('hidden');
-            document.getElementById('special-aid-container').classList.add('hidden'); // Hide button after use
+        function spinRoulette() {
+            const wheel = document.getElementById('roulette-wheel');
+            const spinBtn = document.getElementById('spin-btn');
+            const resultDiv = document.getElementById('roulette-result');
             
-            if (type === 'autofill') {
-                autoFillWords(3);
-            } else if (type === 'flash') {
-                flashReveal();
+            spinBtn.disabled = true;
+            spinBtn.classList.add('opacity-50');
+            wheel.classList.add('spinning-glow');
+            
+            // Random result: 0=A, 1=B, 2=C, 3=D
+            const result = Math.floor(Math.random() * 4);
+            
+            // Calculate rotation (3-5 full spins + landing position)
+            // Each segment is 90 degrees
+            // Result 0 (A) = stop at 315-45 degrees area (top)
+            // Result 1 (B) = stop at 45-135 degrees
+            // Result 2 (C) = stop at 135-225 degrees
+            // Result 3 (D) = stop at 225-315 degrees
+            
+            const baseSpins = 1080 + Math.floor(Math.random() * 720); // 3-5 spins
+            const segmentOffset = [337, 67, 157, 247]; // Center of each segment at top
+            const finalRotation = baseSpins + segmentOffset[result] + (Math.random() * 40 - 20);
+            
+            wheel.style.transform = `rotate(${finalRotation}deg)`;
+            
+            setTimeout(() => {
+                wheel.classList.remove('spinning-glow');
+                showRouletteResult(result);
+            }, 4200);
+        }
+
+        function showRouletteResult(result) {
+            const resultDiv = document.getElementById('roulette-result');
+            resultDiv.classList.remove('hidden');
+            resultDiv.classList.add('result-reveal');
+            
+            const results = [
+                { emoji: '🤖', text: 'ช่วยจัดคำลงช่อง 3 คำ!', color: 'bg-blue-100 border-blue-400', action: 'autofill' },
+                { emoji: '⚡', text: 'เปิดเฉลย 1 วินาที!', color: 'bg-yellow-100 border-yellow-400', action: 'flash' },
+                { emoji: '⏰', text: 'เพิ่มเวลา 30 วินาที!', color: 'bg-green-100 border-green-400', action: 'addtime' },
+                { emoji: '🔀', text: 'สลับตำแหน่ง 3 คำ!', color: 'bg-red-100 border-red-400', action: 'shuffle' }
+            ];
+            
+            const r = results[result];
+            resultDiv.className = `mt-4 p-4 rounded-lg text-center border-2 ${r.color} result-reveal`;
+            resultDiv.innerHTML = `
+                <div class="text-3xl mb-2">${r.emoji}</div>
+                <div class="font-bold text-lg">${r.text}</div>
+                <button onclick="executeRouletteResult('${r.action}')" class="mt-3 bg-brown-main text-white font-bold py-2 px-6 rounded-lg hover:opacity-90">
+                    ใช้เลย!
+                </button>
+            `;
+        }
+
+        function executeRouletteResult(action) {
+            document.getElementById('roulette-modal').classList.add('hidden');
+            document.getElementById('special-aid-container').classList.add('hidden');
+            
+            switch(action) {
+                case 'autofill':
+                    autoFillWords(3);
+                    break;
+                case 'flash':
+                    flashReveal();
+                    break;
+                case 'addtime':
+                    addBonusTime(30);
+                    break;
+                case 'shuffle':
+                    shuffleCorrectWords(3);
+                    break;
             }
         }
 
         function autoFillWords(count) {
             const dropZones = Array.from(document.querySelectorAll('.drop-zone'));
-            // Find empty zones
-            const emptyZones = dropZones.filter(z => !z.hasChildNodes());
+            const emptyZones = dropZones.filter(z => z.children.length === 0);
             
             let filled = 0;
             for (let zone of emptyZones) {
                 if (filled >= count) break;
                 
                 const targetText = zone.dataset.target;
-                // Find word in bank
                 const wordBank = document.getElementById('word-bank');
                 const words = Array.from(wordBank.children);
-                // Look for word that is NOT hidden
-                const matchingWord = words.find(w => w.innerText.trim() === targetText && !w.classList.contains('invisible'));
+                const matchingWord = words.find(w => w.innerText.trim() === targetText && !w.classList.contains('hidden-word'));
 
                 if (matchingWord) {
                     moveWordToZone(matchingWord, zone);
                     filled++;
                 }
             }
-            Swal.fire({ icon: 'success', title: 'จัดเรียงให้ 3 คำแล้ว!', timer: 1500, showConfirmButton: false });
+            Swal.fire({ icon: 'success', title: `จัดเรียงให้ ${filled} คำแล้ว!`, timer: 1500, showConfirmButton: false });
         }
 
         function flashReveal() {
             const overlay = document.getElementById('flash-reveal-overlay');
+            const content = document.getElementById('flash-answer-content');
+            content.innerHTML = gameState.currentPoem.displayText.replace(/\n/g, '<br>');
             overlay.classList.remove('hidden');
             setTimeout(() => {
                 overlay.classList.add('hidden');
             }, 1000);
         }
 
-        // --- Level Setup ---
-        function setupLevel1() {
-            const wordBank = document.getElementById('word-bank');
-            const shuffledWords = [...gameState.level1Words].sort(() => Math.random() - 0.5);
-
-            shuffledWords.forEach(word => {
-                const el = document.createElement('div');
-                el.className = 'word-card bg-white border border-yellow-400 shadow-md rounded-lg px-2 py-1 md:px-4 md:py-2 font-bold text-brown-main';
-                el.innerText = word;
-                el.draggable = true;
-                el.id = `word-${word}-${Math.random().toString(36).substr(2, 5)}`; 
-                
-                el.addEventListener('dragstart', dragStart);
-                el.addEventListener('dragend', dragEnd);
-                el.addEventListener('click', () => selectWord(el));
-                
-                wordBank.appendChild(el);
-            });
-
-            const dropZones = document.querySelectorAll('.drop-zone');
-            dropZones.forEach(zone => {
-                zone.addEventListener('dragover', dragOver);
-                zone.addEventListener('dragleave', dragLeave);
-                zone.addEventListener('drop', drop);
-                zone.addEventListener('click', () => placeSelectedWord(zone));
-            });
+        function addBonusTime(seconds) {
+            gameState.bonusTime += seconds;
+            Swal.fire({ icon: 'success', title: `เพิ่มเวลา ${seconds} วินาที!`, text: 'เวลาที่แสดงจะนับช้าลง', timer: 1500, showConfirmButton: false });
         }
 
-        // --- Drag & Drop / Tap Logic (Improved) ---
+        function shuffleCorrectWords(count) {
+            const dropZones = Array.from(document.querySelectorAll('.drop-zone'));
+            const correctZones = dropZones.filter(zone => {
+                if (zone.children.length === 0) return false;
+                const placedWord = zone.children[0].innerText.trim();
+                return placedWord === zone.dataset.target;
+            });
+
+            const shuffled = correctZones.sort(() => Math.random() - 0.5).slice(0, count);
+            const wordBank = document.getElementById('word-bank');
+
+            shuffled.forEach(zone => {
+                const wordEl = zone.children[0];
+                wordBank.appendChild(wordEl);
+                wordEl.classList.remove('hidden-word');
+                zone.classList.remove('filled', 'bg-green-100', 'border-green-500');
+            });
+
+            Swal.fire({ icon: 'warning', title: `สลับ ${shuffled.length} คำกลับไปคลังคำ!`, timer: 1500, showConfirmButton: false });
+        }
+
+        // --- IMPROVED DRAG & DROP / TAP LOGIC ---
+        let touchDragging = null;
+        let touchClone = null;
+
         function dragStart(e) {
             e.dataTransfer.setData('text/plain', e.target.id);
-            // Don't fully hide, just opacity reduce so we can see what we are dragging, 
-            // but styling handles 'invisible' class for source
-            setTimeout(() => e.target.classList.add('invisible'), 0);
-            selectWord(e.target);
+            e.dataTransfer.effectAllowed = 'move';
+            setTimeout(() => e.target.classList.add('hidden-word'), 0);
+            gameState.selectedWord = e.target;
         }
 
         function dragEnd(e) {
-            e.target.classList.remove('invisible');
+            e.target.classList.remove('hidden-word');
+            // Clear selection if drag completed
+            if (gameState.selectedWord === e.target) {
+                gameState.selectedWord.classList.remove('selected');
+                gameState.selectedWord = null;
+            }
         }
 
         function dragOver(e) {
             e.preventDefault();
-            e.target.closest('.drop-zone').classList.add('hovered');
+            e.dataTransfer.dropEffect = 'move';
+            const zone = e.target.closest('.drop-zone');
+            if (zone) zone.classList.add('hovered');
         }
 
         function dragLeave(e) {
-            e.target.closest('.drop-zone').classList.remove('hovered');
+            const zone = e.target.closest('.drop-zone');
+            if (zone) zone.classList.remove('hovered');
         }
 
         function drop(e) {
             e.preventDefault();
             const zone = e.target.closest('.drop-zone');
+            if (!zone) return;
+            
             zone.classList.remove('hovered');
             const id = e.dataTransfer.getData('text/plain');
             const draggable = document.getElementById(id);
             
             if (zone && draggable) {
-                // *** FIX: If zone has a word, return it to bank first ***
-                if (zone.hasChildNodes()) {
-                    const existingItem = zone.firstChild;
-                    const wordBank = document.getElementById('word-bank');
-                    wordBank.appendChild(existingItem);
-                    existingItem.classList.remove('invisible'); // Ensure it's visible
+                // If zone has a word, return it to bank first
+                if (zone.children.length > 0) {
+                    const existingItem = zone.children[0];
+                    returnToWordBank(existingItem);
                 }
                 moveWordToZone(draggable, zone);
             }
         }
 
+        // Touch events for mobile
+        function touchStart(e) {
+            if (e.touches.length !== 1) return;
+            
+            const touch = e.touches[0];
+            touchDragging = e.target;
+            
+            // Create visual clone
+            touchClone = e.target.cloneNode(true);
+            touchClone.style.position = 'fixed';
+            touchClone.style.zIndex = '9999';
+            touchClone.style.pointerEvents = 'none';
+            touchClone.style.opacity = '0.8';
+            touchClone.style.transform = 'scale(1.1)';
+            document.body.appendChild(touchClone);
+            
+            updateTouchClonePosition(touch);
+            e.target.classList.add('hidden-word');
+            
+            e.preventDefault();
+        }
+
+        function touchMove(e) {
+            if (!touchDragging || e.touches.length !== 1) return;
+            
+            const touch = e.touches[0];
+            updateTouchClonePosition(touch);
+            
+            // Highlight drop zone under finger
+            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+            document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('hovered'));
+            
+            if (elementUnder) {
+                const zone = elementUnder.closest('.drop-zone');
+                if (zone) zone.classList.add('hovered');
+            }
+            
+            e.preventDefault();
+        }
+
+        function touchEnd(e) {
+            if (!touchDragging) return;
+            
+            // Remove clone
+            if (touchClone && touchClone.parentNode) {
+                touchClone.parentNode.removeChild(touchClone);
+            }
+            touchClone = null;
+            
+            // Find drop zone
+            const touch = e.changedTouches[0];
+            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('hovered'));
+            
+            if (elementUnder) {
+                const zone = elementUnder.closest('.drop-zone');
+                if (zone) {
+                    // If zone has a word, return it to bank
+                    if (zone.children.length > 0) {
+                        const existingItem = zone.children[0];
+                        returnToWordBank(existingItem);
+                    }
+                    moveWordToZone(touchDragging, zone);
+                } else {
+                    // Return to original position
+                    touchDragging.classList.remove('hidden-word');
+                }
+            } else {
+                touchDragging.classList.remove('hidden-word');
+            }
+            
+            touchDragging = null;
+        }
+
+        function updateTouchClonePosition(touch) {
+            if (touchClone) {
+                touchClone.style.left = (touch.clientX - 30) + 'px';
+                touchClone.style.top = (touch.clientY - 20) + 'px';
+            }
+        }
+
         function selectWord(el) {
-            if (gameState.selectedWord) gameState.selectedWord.classList.remove('selected');
-            if (gameState.selectedWord === el && el.parentElement.id === 'word-bank') {
+            // If clicking the same selected word in bank, deselect
+            if (gameState.selectedWord === el) {
+                el.classList.remove('selected');
                 gameState.selectedWord = null;
                 return;
             }
+            
+            // Deselect previous
+            if (gameState.selectedWord) {
+                gameState.selectedWord.classList.remove('selected');
+            }
+            
+            // If clicking a word that's in a drop-zone, return it to bank first
+            if (el.parentElement && el.parentElement.classList.contains('drop-zone')) {
+                returnToWordBank(el);
+                gameState.selectedWord = null;
+                return;
+            }
+            
             gameState.selectedWord = el;
             el.classList.add('selected');
         }
 
         function placeSelectedWord(zone) {
-            if (gameState.selectedWord) {
-                // *** FIX: If zone has a word, return it to bank first ***
-                if (zone.hasChildNodes()) {
-                     const existingItem = zone.firstChild;
-                     const wordBank = document.getElementById('word-bank');
-                     wordBank.appendChild(existingItem);
-                     existingItem.classList.remove('invisible');
-                }
+            if (!gameState.selectedWord) return;
+            
+            // If zone has a word, return it to bank first
+            if (zone.children.length > 0) {
+                const existingItem = zone.children[0];
+                returnToWordBank(existingItem);
+            }
 
-                moveWordToZone(gameState.selectedWord, zone);
-                gameState.selectedWord.classList.remove('selected');
-                gameState.selectedWord = null;
-            } 
+            moveWordToZone(gameState.selectedWord, zone);
+            gameState.selectedWord.classList.remove('selected');
+            gameState.selectedWord = null;
         }
 
         function moveWordToZone(item, zone) {
-            // zone.innerHTML = ''; // No longer need to clear simply, we handled swapping above
+            item.classList.remove('hidden-word');
             zone.appendChild(item);
             zone.classList.add('filled');
-            item.classList.remove('invisible');
+        }
+
+        function returnToWordBank(item) {
+            const wordBank = document.getElementById('word-bank');
+            item.classList.remove('hidden-word');
+            wordBank.appendChild(item);
+            
+            // Clear zone styling
+            const parentZone = item.parentElement;
+            if (parentZone && parentZone.classList.contains('drop-zone')) {
+                parentZone.classList.remove('filled', 'bg-green-100', 'border-green-500', 'bg-red-100', 'border-red-500');
+            }
         }
 
         // --- Rhyme Line Drawing ---
         function drawRhymeLines() {
             const svg = document.getElementById('svg-lines');
             svg.innerHTML = '';
+            
             const connections = [
                 { from: 'slot-1-5', to: 'slot-2-3', color: '#E91E63' },
-                { from: 'slot-2-6', to: 'slot-3-5', color: '#E91E63' } 
+                { from: 'slot-2-6', to: 'slot-3-5', color: '#E91E63' }
             ];
+
+            const container = document.getElementById('poem-container');
+            const containerRect = container.getBoundingClientRect();
 
             connections.forEach(conn => {
                 const el1 = document.getElementById(conn.from);
                 const el2 = document.getElementById(conn.to);
+                
                 if (el1 && el2) {
                     const rect1 = el1.getBoundingClientRect();
                     const rect2 = el2.getBoundingClientRect();
-                    const parentRect = svg.getBoundingClientRect();
 
-                    const x1 = rect1.left + rect1.width / 2 - parentRect.left;
-                    const y1 = rect1.top + rect1.height / 2 - parentRect.top;
-                    const x2 = rect2.left + rect2.width / 2 - parentRect.left;
-                    const y2 = rect2.top + rect2.height / 2 - parentRect.top;
+                    const x1 = rect1.left + rect1.width / 2 - containerRect.left;
+                    const y1 = rect1.top + rect1.height / 2 - containerRect.top;
+                    const x2 = rect2.left + rect2.width / 2 - containerRect.left;
+                    const y2 = rect2.top + rect2.height / 2 - containerRect.top;
 
                     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                    const d = `M ${x1} ${y1} Q ${(x1 + x2) / 2} ${(y1 + y2) / 2 + 30} ${x2} ${y2}`;
+                    const midY = (y1 + y2) / 2 + 25;
+                    const d = `M ${x1} ${y1} Q ${(x1 + x2) / 2 + 30} ${midY} ${x2} ${y2}`;
                     path.setAttribute("d", d);
                     path.setAttribute("stroke", conn.color);
-                    path.setAttribute("stroke-width", "3");
+                    path.setAttribute("stroke-width", "2");
                     path.setAttribute("fill", "none");
-                    path.setAttribute("stroke-dasharray", "5,5");
+                    path.setAttribute("stroke-dasharray", "4,4");
                     path.classList.add('fade-in');
                     svg.appendChild(path);
 
-                    [ {x:x1, y:y1}, {x:x2, y:y2} ].forEach(pt => {
+                    [{x:x1, y:y1}, {x:x2, y:y2}].forEach(pt => {
                         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                         circle.setAttribute("cx", pt.x);
                         circle.setAttribute("cy", pt.y);
-                        circle.setAttribute("r", "4");
+                        circle.setAttribute("r", "3");
                         circle.setAttribute("fill", conn.color);
                         svg.appendChild(circle);
                     });
@@ -618,7 +1168,7 @@
             });
         }
 
-        // --- Check Answer (Feedback Only) ---
+        // --- Check Answer ---
         function checkAnswer(showAlert = true) {
             const dropZones = document.querySelectorAll('.drop-zone');
             let correctCount = 0;
@@ -651,7 +1201,7 @@
             return correctCount;
         }
 
-        // --- Submit Game (Finalize) ---
+        // --- Submit Game ---
         function submitGame() {
             const dropZones = document.querySelectorAll('.drop-zone');
             const emptyZones = Array.from(dropZones).filter(z => z.children.length === 0);
@@ -682,7 +1232,7 @@
             let total = dropZones.length;
 
             const accuracyScore = Math.round((correctCount / total) * 80);
-            const timePenalty = Math.min(20, Math.floor(gameState.elapsedSeconds / 10));
+            const timePenalty = Math.min(20, Math.floor(gameState.elapsedSeconds / 15));
             const timeBonus = Math.max(0, 20 - timePenalty);
             const finalScore = accuracyScore + timeBonus;
 
@@ -696,9 +1246,14 @@
             
             document.getElementById('result-name').innerText = `ผู้เล่น: ${gameState.player.firstname} ${gameState.player.lastname}`;
             document.getElementById('final-score').innerText = score;
+            
             const mins = Math.floor(gameState.elapsedSeconds / 60);
             const secs = gameState.elapsedSeconds % 60;
             document.getElementById('final-time').innerText = `เวลาที่ใช้: ${mins} นาที ${secs} วินาที`;
+
+            // Display correct answer
+            document.getElementById('correct-answer-display').innerHTML = 
+                gameState.currentPoem.displayText.replace(/\n/g, '<br>');
 
             const analysisEl = document.getElementById('analysis-text');
             const suggestEl = document.getElementById('suggestion-text');
@@ -721,6 +1276,7 @@
             const data = {
                 timestamp: new Date().toISOString(),
                 ...gameState.player,
+                poemId: gameState.currentPoem.id,
                 score: score,
                 time: gameState.elapsedSeconds
             };
@@ -734,7 +1290,6 @@
                 console.log("Score saved successfully");
             }).catch(err => console.error("Error saving score:", err));
         }
-
     </script>
 </body>
 </html>
