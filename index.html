@@ -14,6 +14,7 @@
     <audio id="sound-quiz" preload="auto"><source src="https://nonthaphathr.github.io/uploadimg/tuachuay.mp3" type="audio/mpeg"></audio>
     <audio id="sound-submit" preload="auto"><source src="https://nonthaphathr.github.io/uploadimg/yehwinner.mp3" type="audio/mpeg"></audio>
     <audio id="sound-replay" preload="auto"><source src="https://nonthaphathr.github.io/uploadimg/replay.mp3" type="audio/mpeg"></audio>
+    <audio id="sound-fail" preload="auto"><source src="https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3" type="audio/mpeg"></audio>
 
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #fdfcf0; }
@@ -27,20 +28,22 @@
         .bg-gold { background: linear-gradient(135deg, #D4AF37 0%, #C5A028 100%); }
         .text-gold { color: #D4AF37; }
 
-        .verse-row { display: flex; flex-wrap: nowrap; justify-content: center; gap: 4px; margin-bottom: 1.5rem; overflow-x: auto; padding: 4px 0; }
+        /* Verse Layout */
+        .verse-row { display: flex; flex-wrap: nowrap; justify-content: center; gap: 6px; margin-bottom: 2.5rem; overflow-x: auto; padding: 4px 0; }
         .verse-group { flex-shrink: 0; position: relative; }
 
+        /* Drop Zone */
         .drop-zone {
             transition: all 0.3s ease; position: relative;
             width: 2.8rem; height: 2.5rem;
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.85rem; z-index: 20; /* Ensure boxes are above lines */
+            font-size: 0.85rem; z-index: 10;
             background-color: #fff;
         }
         
         @media (min-width: 640px) {
             .drop-zone { width: 3.5rem; height: 3rem; font-size: 1rem; }
-            .verse-row { gap: 12px; margin-bottom: 2rem; }
+            .verse-row { gap: 14px; margin-bottom: 3rem; }
         }
         @media (min-width: 768px) {
             .drop-zone { width: 4rem; height: 3.2rem; font-size: 1.1rem; }
@@ -49,6 +52,27 @@
         .drop-zone.hovered { background-color: #ffe0b2 !important; border-color: #ff9800 !important; transform: scale(1.08); }
         .drop-zone.filled { background-color: #fff8e1; border-style: solid; }
         
+        /* Rhyme Label Above Box */
+        .rhyme-label {
+            position: absolute;
+            bottom: 110%; /* Place above the box */
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.6rem;
+            background-color: #FFF8E1;
+            border: 1px solid #FFD54F;
+            padding: 2px 6px;
+            border-radius: 10px;
+            color: #E65100;
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            z-index: 20;
+            pointer-events: none;
+        }
+        @media (min-width: 768px) { .rhyme-label { font-size: 0.75rem; padding: 3px 8px; } }
+
+        /* Word Card */
         .word-card {
             cursor: grab; touch-action: none; user-select: none;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -59,68 +83,47 @@
         .word-card.selected { box-shadow: 0 0 0 3px #D4AF37; background-color: #fff3cd !important; transform: scale(1.08); }
         .word-card.hidden-word { visibility: hidden; position: absolute; pointer-events: none; }
 
-        /* SVG Overlay for Rhymes */
-        #svg-lines {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 10; /* Below cards but visible */
-        }
-        #poem-container { position: relative; }
-        
         .fade-in { animation: fadeIn 0.5s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .modal-overlay { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
+        
+        /* Floating Button */
         .floating-aid-btn { position: fixed; right: 10px; top: 50%; transform: translateY(-50%); z-index: 50; transition: all 0.3s ease; }
         .floating-aid-btn:hover { transform: translateY(-50%) scale(1.1); }
+        
+        /* Flash Reveal */
         #flash-reveal-overlay { z-index: 9999; background: rgba(255, 255, 255, 0.98); }
 
-        /* ROULETTE STYLES */
-        .roulette-container { position: relative; width: 260px; height: 260px; margin: 0 auto; }
-        @media (min-width: 640px) { .roulette-container { width: 300px; height: 300px; } }
-        .roulette-wheel {
-            width: 100%; height: 100%; border-radius: 50%; position: relative;
-            border: 6px solid #5D4037; box-shadow: 0 0 20px rgba(0,0,0,0.3);
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-            /* Gradient matching the logic: 0-90 Blue, 90-180 Yellow, 180-270 Green, 270-360 Red */
-            background: conic-gradient(
-                from 0deg,
-                #3B82F6 0deg 90deg,     /* Blue - 3 คำ */
-                #F59E0B 90deg 180deg,   /* Yellow - เฉลย */
-                #10B981 180deg 270deg,  /* Green - เพิ่มเวลา */
-                #EF4444 270deg 360deg   /* Red - สลับคำ */
-            );
+        /* CARD FLIP STYLES */
+        .perspective-1000 { perspective: 1000px; }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s; transform-style: preserve-3d;
+            cursor: pointer;
         }
-        .roulette-icon { position: absolute; font-size: 1.8rem; transform: translate(-50%, -50%) rotate(0deg); }
-        /* Positioning icons in center of segments */
-        .roulette-icon-a { top: 25%; left: 75%; transform: translate(-50%, -50%) rotate(45deg); } /* Blue */
-        .roulette-icon-b { top: 75%; left: 75%; transform: translate(-50%, -50%) rotate(135deg); } /* Yellow */
-        .roulette-icon-c { top: 75%; left: 25%; transform: translate(-50%, -50%) rotate(225deg); } /* Green */
-        .roulette-icon-d { top: 25%; left: 25%; transform: translate(-50%, -50%) rotate(315deg); } /* Red */
+        .card-container.flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            border-radius: 1rem; display: flex; align-items: center; justify-content: center; flex-col;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card-front { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #fff; }
+        .card-back { background-color: white; transform: rotateY(180deg); border: 2px solid #D4AF37; }
 
-        .roulette-pointer {
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
-            border-top: 30px solid #E91E63; z-index: 10; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        }
-        .roulette-center {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 50px; height: 50px; background: linear-gradient(135deg, #D4AF37, #B8860B);
-            border-radius: 50%; border: 4px solid #5D4037; z-index: 5;
-            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
-        }
-        .spinning-glow { animation: pulse-glow 0.3s infinite; }
-        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); } 50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.8); } }
-        .result-reveal { animation: resultPop 0.5s ease-out; }
-        @keyframes resultPop { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+        /* Timer Bar */
+        .timer-bar-container { width: 100%; height: 6px; background: #eee; border-radius: 3px; margin-bottom: 10px; overflow: hidden; }
+        .timer-bar { height: 100%; background: #EF4444; width: 100%; transition: width 0.1s linear; }
+
+        /* Exit Animation */
+        #exit-overlay { opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+        #exit-overlay.active { opacity: 1; pointer-events: auto; }
 
         /* Logo Animation */
         .logo-container { position: relative; display: inline-block; }
-        .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #D4AF37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); animation: logoFloat 3s ease-in-out infinite, logoGlow 2s ease-in-out infinite alternate; }
+        .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #D4AF37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); animation: logoFloat 3s ease-in-out infinite; }
         @media (min-width: 768px) { .logo-img { width: 80px; height: 80px; } }
-        @keyframes logoFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-5px) rotate(2deg); } 50% { transform: translateY(0) rotate(0deg); } 75% { transform: translateY(-3px) rotate(-2deg); } }
-        @keyframes logoGlow { 0% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.4); } 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.8); } }
-        .logo-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90px; height: 90px; border: 2px solid rgba(212, 175, 55, 0.5); border-radius: 50%; animation: logoRingPulse 2s ease-out infinite; }
-        @media (min-width: 768px) { .logo-ring { width: 110px; height: 110px; } }
-        @keyframes logoRingPulse { 0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } }
+        @keyframes logoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-2 md:p-4 relative overflow-x-hidden">
@@ -133,7 +136,6 @@
             <div class="absolute top-0 left-0 w-full h-2 bg-gold"></div>
             <div class="flex justify-center mb-3">
                 <div class="logo-container">
-                    <div class="logo-ring"></div>
                     <img src="https://nonthaphathr.github.io/uploadimg/logokhampraphan-non.png" alt="Logo" class="logo-img">
                 </div>
             </div>
@@ -211,10 +213,10 @@
             </div>
 
             <div id="special-aid-container" class="hidden floating-aid-btn">
-                <button onclick="showRouletteModal()" class="flex flex-col items-center justify-center bg-gradient-to-r from-purple-500 to-pink-600 text-white w-16 h-16 md:w-24 md:h-24 rounded-full shadow-2xl border-4 border-white animate-bounce hover:animate-none group">
-                    <span class="text-xl md:text-3xl mb-0.5 group-hover:scale-110 transition">🎰</span>
-                    <span class="text-[8px] md:text-xs font-bold leading-none">หมุนวงล้อ</span>
-                    <span class="text-[8px] md:text-xs font-bold leading-none">ลุ้นรางวัล!</span>
+                <button onclick="showCardModal()" class="flex flex-col items-center justify-center bg-gradient-to-r from-purple-500 to-pink-600 text-white w-16 h-16 md:w-24 md:h-24 rounded-full shadow-2xl border-4 border-white animate-bounce hover:animate-none group">
+                    <span class="text-xl md:text-3xl mb-0.5 group-hover:scale-110 transition">🃏</span>
+                    <span class="text-[8px] md:text-xs font-bold leading-none">เสี่ยงดวง</span>
+                    <span class="text-[8px] md:text-xs font-bold leading-none">เปิดไพ่!</span>
                 </button>
             </div>
 
@@ -224,7 +226,6 @@
                 <p class="text-center text-gray-500 text-xs mb-3">"คลิกที่คำ" แล้วนำไป "คลิกที่ช่องว่าง" หรือลากไปวาง</p>
 
                 <div class="bg-white p-2 md:p-4 rounded-xl border-2 border-dashed border-gray-300 relative z-10 max-w-4xl mx-auto" id="poem-container">
-                    <svg id="svg-lines"></svg>
                     </div>
 
                 <div class="mt-4 md:mt-8">
@@ -266,7 +267,7 @@
                 </div>
             </div>
 
-            <button onclick="playSound('sound-replay'); setTimeout(() => location.reload(), 500);" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 mx-auto">
+            <button onclick="playAgain()" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 mx-auto border-2 border-gray-300">
                 🔄 เล่นใหม่อีกครั้ง
             </button>
         </div>
@@ -275,7 +276,13 @@
 
     <div id="quiz-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full border-4 border-purple-400 transform scale-100 transition-transform">
-            <h3 class="text-xl font-bold text-purple-700 text-center mb-4">🎁 คำถามชิงสิทธิ์หมุนวงล้อ!</h3>
+            <h3 class="text-xl font-bold text-purple-700 text-center mb-2">🎁 คำถามชิงสิทธิ์เปิดไพ่!</h3>
+            
+            <div class="text-center text-xs text-red-500 mb-1 font-bold">รีบตอบก่อนเวลาหมด!</div>
+            <div class="timer-bar-container">
+                <div id="quiz-timer-bar" class="timer-bar"></div>
+            </div>
+
             <p class="text-center mb-6 text-lg" id="quiz-question">ข้อใดเป็น <span class="text-red-500 font-bold">"ลหุ"</span> ?</p>
             
             <div class="grid grid-cols-2 gap-4" id="quiz-options">
@@ -283,40 +290,24 @@
         </div>
     </div>
 
-    <div id="roulette-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl p-4 md:p-6 max-w-md w-full border-4 border-gold">
-            <h3 class="text-xl md:text-2xl font-bold text-brown-main text-center mb-4">🎰 หมุนวงล้อลุ้นตัวช่วย!</h3>
+    <div id="card-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl p-4 md:p-6 max-w-2xl w-full border-4 border-gold">
+            <h3 class="text-xl md:text-2xl font-bold text-brown-main text-center mb-4">🃏 เลือกไพ่ 1 ใบเสี่ยงดวง!</h3>
+            <p class="text-center text-gray-500 mb-6 text-sm">ระวัง! อาจมีตัวช่วย "ซ้ำเติม" ซ่อนอยู่</p>
             
-            <div class="roulette-container">
-                <div class="roulette-pointer"></div>
-                <div class="roulette-wheel" id="roulette-wheel">
-                    <span class="roulette-icon roulette-icon-a">🤖</span>
-                    <span class="roulette-icon roulette-icon-b">⚡</span>
-                    <span class="roulette-icon roulette-icon-c">⏰</span>
-                    <span class="roulette-icon roulette-icon-d">🔀</span>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="card-grid">
                 </div>
-                <div class="roulette-center">🎲</div>
-            </div>
-
-            <div class="mt-4 grid grid-cols-2 gap-2 text-xs md:text-sm">
-                <div class="flex items-center gap-1"><span class="w-4 h-4 bg-blue-500 rounded"></span> ช่วยจัด 3 คำ</div>
-                <div class="flex items-center gap-1"><span class="w-4 h-4 bg-yellow-500 rounded"></span> เปิดเฉลย 1 วิ</div>
-                <div class="flex items-center gap-1"><span class="w-4 h-4 bg-green-500 rounded"></span> เพิ่มเวลา 30 วิ</div>
-                <div class="flex items-center gap-1"><span class="w-4 h-4 bg-red-500 rounded"></span> สลับ 3 คำ</div>
-            </div>
-
-            <button onclick="spinRoulette()" id="spin-btn" class="mt-4 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition text-lg">
-                🎲 หมุนเลย!
-            </button>
-            
-            <div id="roulette-result" class="hidden mt-4 p-4 rounded-lg text-center">
-            </div>
         </div>
     </div>
 
     <div id="flash-reveal-overlay" class="fixed inset-0 hidden flex items-center justify-center">
         <div id="flash-answer-content" class="text-xl md:text-4xl font-bold text-brown-main text-center bg-white p-4 md:p-10 rounded-xl shadow-2xl border-8 border-gold m-4 leading-loose">
         </div>
+    </div>
+
+    <div id="exit-overlay" class="fixed inset-0 z-[9999] bg-black bg-opacity-90 flex flex-col items-center justify-center text-white">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-gold mb-4"></div>
+        <p class="text-xl font-bold">กำลังเตรียมเริ่มเกมใหม่...</p>
     </div>
 
     <script>
@@ -373,8 +364,9 @@
             currentPoem: null,
             allWords: [],
             quizTriggered: {}, 
-            bonusTime: 0,
-            isGuest: false
+            bonusTime: 0, // In seconds (Positive = Bad/Penalty add to time, Negative = Good/Reduce time)
+            isGuest: false,
+            quizTimerInterval: null
         };
 
         function playSound(soundId) {
@@ -388,13 +380,7 @@
         // --- Initialization ---
         function startGuestGame() {
             gameState.isGuest = true;
-            gameState.player = {
-                prefix: '',
-                level: '-',
-                firstname: 'ผู้เยี่ยมชม',
-                lastname: '(Guest)',
-                number: '-'
-            };
+            gameState.player = { prefix: '', level: '-', firstname: 'ผู้เยี่ยมชม', lastname: '(Guest)', number: '-' };
             initGame();
         }
 
@@ -415,12 +401,8 @@
             playSound('sound-start');
             document.getElementById('page-register').classList.add('hidden');
             document.getElementById('page-game').classList.remove('hidden');
-            
-            if (gameState.isGuest) {
-                 document.getElementById('player-name-display').innerText = `ผู้เล่น: ผู้เยี่ยมชม (Guest)`;
-            } else {
-                document.getElementById('player-name-display').innerText = `ผู้เล่น: ${gameState.player.firstname} ${gameState.player.level}`;
-            }
+            document.getElementById('player-name-display').innerText = gameState.isGuest ? 
+                `ผู้เล่น: ผู้เยี่ยมชม (Guest)` : `ผู้เล่น: ${gameState.player.firstname} ${gameState.player.level}`;
 
             const randomIndex = Math.floor(Math.random() * POEMS_DATA.length);
             gameState.currentPoem = POEMS_DATA[randomIndex];
@@ -428,18 +410,12 @@
 
             setupPoemUI();
             startTimer();
-            
-            setTimeout(drawRhymeLines, 500);
-            window.addEventListener('resize', drawRhymeLines);
         }
 
         // --- Dynamic Poem UI ---
         function setupPoemUI() {
             const container = document.getElementById('poem-container');
-            const svg = document.getElementById('svg-lines');
             container.innerHTML = '';
-            container.appendChild(svg);
-            
             const poem = gameState.currentPoem;
             gameState.allWords = [];
 
@@ -449,7 +425,6 @@
 
                 verse.forEach((syllable, syllableIndex) => {
                     gameState.allWords.push(syllable.word);
-                    
                     const verseGroup = document.createElement('div');
                     verseGroup.className = 'verse-group';
                     
@@ -458,29 +433,31 @@
                     dropZone.dataset.target = syllable.word;
                     dropZone.dataset.type = syllable.type;
                     
-                    // IDs for rhymes
-                    if (syllable.rhyme === 'send1') dropZone.id = 'slot-1-5';
-                    else if (syllable.rhyme === 'recv1') dropZone.id = 'slot-2-3';
-                    else if (syllable.rhyme === 'send2') dropZone.id = 'slot-2-6';
-                    else if (syllable.rhyme === 'recv2') dropZone.id = 'slot-3-5';
+                    // RHYME LABELS (Replaces Lines)
+                    if (syllable.rhyme) {
+                        const label = document.createElement('div');
+                        label.className = 'rhyme-label fade-in';
+                        
+                        // Custom text logic for labels
+                        if (syllable.rhyme === 'send1') label.innerText = "ส่งสัมผัส ➡️ วรรค 2";
+                        else if (syllable.rhyme === 'recv1') label.innerText = "⬅️ รับสัมผัส";
+                        else if (syllable.rhyme === 'send2') label.innerText = "ส่งสัมผัส ➡️ วรรค 4";
+                        else if (syllable.rhyme === 'recv2') label.innerText = "⬅️ รับสัมผัส";
+                        
+                        verseGroup.appendChild(label);
+                    }
 
                     const typeLabel = document.createElement('div');
                     typeLabel.className = `text-[9px] md:text-[10px] text-center mt-0.5 font-bold ${syllable.type === 'ครุ' ? 'text-blue-600' : 'text-red-500'}`;
-                    
-                    let labelText = syllable.type;
-                    // if (syllable.rhyme) labelText += syllable.rhyme.includes('send') ? ' (ส่ง)' : ' (รับ)'; // Hide text label for clearer look
-                    typeLabel.innerText = labelText;
+                    typeLabel.innerText = syllable.type;
 
                     verseGroup.appendChild(dropZone);
                     verseGroup.appendChild(typeLabel);
                     verseRow.appendChild(verseGroup);
                 });
-
                 container.appendChild(verseRow);
             });
-
             setupWordBank();
-            
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 zone.addEventListener('dragover', dragOver);
                 zone.addEventListener('dragleave', dragLeave);
@@ -493,22 +470,18 @@
             const wordBank = document.getElementById('word-bank');
             wordBank.innerHTML = '';
             const shuffledWords = [...gameState.allWords].sort(() => Math.random() - 0.5);
-
             shuffledWords.forEach((word, index) => {
                 const el = document.createElement('div');
                 el.className = 'word-card bg-white border border-yellow-400 shadow-md rounded-lg font-bold text-brown-main';
                 el.innerText = word;
                 el.draggable = true;
                 el.id = `word-${word}-${index}-${Date.now()}`;
-                
                 el.addEventListener('dragstart', dragStart);
                 el.addEventListener('dragend', dragEnd);
                 el.addEventListener('click', () => selectWord(el));
-                
                 el.addEventListener('touchstart', touchStart, { passive: false });
                 el.addEventListener('touchmove', touchMove, { passive: false });
                 el.addEventListener('touchend', touchEnd);
-                
                 wordBank.appendChild(el);
             });
         }
@@ -518,37 +491,41 @@
             gameState.startTime = Date.now();
             gameState.timerInterval = setInterval(() => {
                 const rawSeconds = Math.floor((Date.now() - gameState.startTime) / 1000);
-                gameState.elapsedSeconds = Math.max(0, rawSeconds - gameState.bonusTime);
                 
-                const displaySeconds = rawSeconds;
+                // Effective time = Real time passed - Bonus (Time deducted)
+                // Note: If bonusTime is positive (Penalty), effective time increases. 
+                // We want "Help = Reduce time", so 'addBonusTime(30)' should make bonusTime = 30
+                // Calculation: Time = raw - bonus. 
+                let displaySeconds = Math.max(0, rawSeconds - gameState.bonusTime);
+                
+                gameState.elapsedSeconds = displaySeconds;
+
                 const minutes = Math.floor(displaySeconds / 60).toString().padStart(2, '0');
                 const seconds = (displaySeconds % 60).toString().padStart(2, '0');
                 document.getElementById('timer').innerText = `${minutes}:${seconds}`;
 
-                const minuteMark = Math.floor(displaySeconds / 120);
-                if (displaySeconds > 0 && displaySeconds % 120 === 0 && !gameState.quizTriggered[minuteMark]) {
+                // Trigger quiz every 2 mins of REAL play time
+                const minuteMark = Math.floor(rawSeconds / 120);
+                if (rawSeconds > 0 && rawSeconds % 120 === 0 && !gameState.quizTriggered[minuteMark]) {
                     gameState.quizTriggered[minuteMark] = true;
                     showSpecialQuiz();
                 }
             }, 1000);
         }
 
-        // --- Quiz ---
+        // --- Quiz With 3.5s Timer ---
         function showSpecialQuiz() {
             playSound('sound-quiz');
             const modal = document.getElementById('quiz-modal');
             const optionsContainer = document.getElementById('quiz-options');
+            const timerBar = document.getElementById('quiz-timer-bar');
             optionsContainer.innerHTML = '';
 
             const poem = gameState.currentPoem;
             const correctWord = poem.lahuPool[Math.floor(Math.random() * poem.lahuPool.length)];
             const wrongWord = poem.kruPool[Math.floor(Math.random() * poem.kruPool.length)];
 
-            const options = [
-                { word: correctWord, isCorrect: true },
-                { word: wrongWord, isCorrect: false }
-            ].sort(() => Math.random() - 0.5);
-
+            const options = [{ word: correctWord, isCorrect: true }, { word: wrongWord, isCorrect: false }].sort(() => Math.random() - 0.5);
             options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = "bg-gray-100 hover:bg-purple-100 border-2 border-gray-200 hover:border-purple-400 font-bold py-4 rounded-lg text-lg transition";
@@ -558,100 +535,123 @@
             });
 
             modal.classList.remove('hidden');
+
+            // Start 3.5s Countdown
+            timerBar.style.width = '100%';
+            let timeLeft = 3500; // ms
+            const interval = 100;
+            
+            if (gameState.quizTimerInterval) clearInterval(gameState.quizTimerInterval);
+            
+            gameState.quizTimerInterval = setInterval(() => {
+                timeLeft -= interval;
+                const percent = (timeLeft / 3500) * 100;
+                timerBar.style.width = `${percent}%`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(gameState.quizTimerInterval);
+                    modal.classList.add('hidden');
+                    playSound('sound-fail');
+                    Swal.fire({ icon: 'error', title: 'ช้าไปแล้ว!', text: 'หมดเวลาตอบคำถาม อดได้รางวัลเลย', timer: 2000, showConfirmButton: false });
+                }
+            }, interval);
         }
 
         function answerQuiz(isCorrect) {
+            clearInterval(gameState.quizTimerInterval);
             const modal = document.getElementById('quiz-modal');
             modal.classList.add('hidden');
 
             if (isCorrect) {
-                Swal.fire({ icon: 'success', title: 'ถูกต้อง!', text: 'คุณได้รับสิทธิ์หมุนวงล้อ!', timer: 2000, showConfirmButton: false });
+                Swal.fire({ icon: 'success', title: 'ถูกต้อง!', text: 'คุณได้รับสิทธิ์เปิดไพ่!', timer: 1500, showConfirmButton: false });
                 document.getElementById('special-aid-container').classList.remove('hidden');
             } else {
-                Swal.fire({ icon: 'error', title: 'ผิดครับ', text: 'น่าเสียดาย รอโอกาสหน้านะครับ', timer: 2000, showConfirmButton: false });
+                playSound('sound-fail');
+                Swal.fire({ icon: 'error', title: 'ผิดครับ', text: 'น่าเสียดาย รอโอกาสหน้านะครับ', timer: 1500, showConfirmButton: false });
             }
         }
 
-        // --- ROULETTE SYSTEM (CORRECTED) ---
-        function showRouletteModal() {
-            document.getElementById('roulette-modal').classList.remove('hidden');
-            document.getElementById('roulette-result').classList.add('hidden');
-            document.getElementById('spin-btn').disabled = false;
-            document.getElementById('spin-btn').classList.remove('opacity-50');
-            document.getElementById('roulette-wheel').style.transform = 'rotate(0deg)';
+        // --- CARD SYSTEM (Replaces Roulette) ---
+        function showCardModal() {
+            document.getElementById('card-modal').classList.remove('hidden');
+            const grid = document.getElementById('card-grid');
+            grid.innerHTML = '';
+            
+            // Generate 4 cards
+            for(let i=0; i<4; i++) {
+                const card = document.createElement('div');
+                card.className = 'h-40 perspective-1000 card-container';
+                card.innerHTML = `
+                    <div class="card-inner" onclick="flipCard(this)">
+                        <div class="card-back rounded-xl flex flex-col items-center justify-center bg-white border-4 border-gold cursor-pointer hover:shadow-xl transition">
+                            <span class="text-4xl">🃏</span>
+                            <span class="text-xs font-bold text-brown-main mt-2">แตะเพื่อเปิด</span>
+                        </div>
+                        <div class="card-front rounded-xl flex flex-col items-center justify-center">
+                            </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
         }
 
-        function spinRoulette() {
-            const wheel = document.getElementById('roulette-wheel');
-            const spinBtn = document.getElementById('spin-btn');
+        function flipCard(cardInner) {
+            if (cardInner.parentElement.classList.contains('flipped')) return; // Prevent double click
             
-            spinBtn.disabled = true;
-            spinBtn.classList.add('opacity-50');
-            wheel.classList.add('spinning-glow');
-            
-            // Result Index: 0=Blue, 1=Yellow, 2=Green, 3=Red
-            const result = Math.floor(Math.random() * 4);
-            
-            // Rotation Calculation to match CSS Conic Gradient
-            // Gradient starts 0deg at Top (12 o'clock) going Clockwise:
-            // 0-90: Blue (Index 0) -> Target Center 45deg to Top -> Rotate CCW 45 (or 315)
-            // 90-180: Yellow (Index 1) -> Target Center 135deg to Top -> Rotate CCW 135 (or 225)
-            // 180-270: Green (Index 2) -> Target Center 225deg to Top -> Rotate CCW 225 (or 135)
-            // 270-360: Red (Index 3) -> Target Center 315deg to Top -> Rotate CCW 315 (or 45)
-
-            const targetAngles = [315, 225, 135, 45]; // Angles for [Blue, Yellow, Green, Red]
-            
-            // Base spins + target + randomness
-            const baseSpins = 1440; // 4 full spins
-            const variance = Math.floor(Math.random() * 20) - 10; // +/- 10 deg randomness within segment
-            const finalRotation = baseSpins + targetAngles[result] + variance;
-            
-            wheel.style.transform = `rotate(${finalRotation}deg)`;
-            
-            setTimeout(() => {
-                wheel.classList.remove('spinning-glow');
-                showRouletteResult(result);
-            }, 4200);
-        }
-
-        function showRouletteResult(result) {
-            const resultDiv = document.getElementById('roulette-result');
-            resultDiv.classList.remove('hidden');
-            
-            const results = [
-                { emoji: '🤖', text: 'ช่วยจัดคำลงช่อง 3 คำ!', color: 'bg-blue-100 border-blue-400', action: 'autofill' }, // Blue
-                { emoji: '⚡', text: 'เปิดเฉลย 1 วินาที!', color: 'bg-yellow-100 border-yellow-400', action: 'flash' },     // Yellow
-                { emoji: '⏰', text: 'เพิ่มเวลา 30 วินาที!', color: 'bg-green-100 border-green-400', action: 'addtime' },    // Green
-                { emoji: '🔀', text: 'สลับตำแหน่ง 3 คำ!', color: 'bg-red-100 border-red-400', action: 'shuffle' }       // Red
+            // Reveal Logic
+            const rewards = [
+                { emoji: '🤖', text: 'ช่วยจัด 3 คำ', color: 'from-blue-400 to-blue-600', action: 'autofill' },
+                { emoji: '⚡', text: 'เปิดเฉลย 1 วิ', color: 'from-yellow-400 to-yellow-600', action: 'flash' },
+                { emoji: '⏰', text: 'ลดเวลา 30 วิ', color: 'from-green-400 to-green-600', action: 'addtime' },
+                { emoji: '😈', text: 'สลับคำมั่ว!', color: 'from-red-500 to-red-700', action: 'shuffle' } // Penalty
             ];
             
-            const r = results[result];
-            resultDiv.className = `mt-4 p-4 rounded-lg text-center border-2 ${r.color} result-reveal`;
-            resultDiv.innerHTML = `
-                <div class="text-3xl mb-2">${r.emoji}</div>
-                <div class="font-bold text-lg">${r.text}</div>
-                <button onclick="executeRouletteResult('${r.action}')" class="mt-3 bg-brown-main text-white font-bold py-2 px-6 rounded-lg hover:opacity-90">
-                    ใช้เลย!
-                </button>
+            // Random reward
+            const result = rewards[Math.floor(Math.random() * rewards.length)];
+            
+            const front = cardInner.querySelector('.card-front');
+            front.className = `card-front bg-gradient-to-br ${result.color} text-white border-2 border-white`;
+            front.innerHTML = `
+                <div class="text-4xl mb-2">${result.emoji}</div>
+                <div class="font-bold text-lg">${result.text}</div>
             `;
+            
+            cardInner.parentElement.classList.add('flipped');
+            
+            // Disable other cards
+            document.querySelectorAll('.card-container').forEach(c => c.style.pointerEvents = 'none');
+
+            // Wait then execute
+            setTimeout(() => {
+                document.getElementById('card-modal').classList.add('hidden');
+                document.getElementById('special-aid-container').classList.add('hidden');
+                executeCardResult(result.action);
+            }, 1500);
         }
 
-        function executeRouletteResult(action) {
-            document.getElementById('roulette-modal').classList.add('hidden');
-            document.getElementById('special-aid-container').classList.add('hidden');
-            
+        function executeCardResult(action) {
             switch(action) {
                 case 'autofill': autoFillWords(3); break;
                 case 'flash': flashReveal(); break;
-                case 'addtime': addBonusTime(30); break;
-                case 'shuffle': shuffleCorrectWords(3); break;
+                case 'addtime': addBonusTime(30); break; // Good: Reduce elapsed time
+                case 'shuffle': 
+                    playSound('sound-fail');
+                    Swal.fire({ 
+                        imageUrl: 'https://media.tenor.com/2n0085y9mN8AAAAC/laughing-cat.gif',
+                        imageWidth: 150,
+                        title: 'อุ๊ยยยยย!', 
+                        text: 'ผู้ช่วย...ซ้ำเติม เสียใจด้วยน้าา', 
+                        confirmButtonText: 'ยอมรับชะตากรรม' 
+                    }).then(() => {
+                         shuffleCorrectWords(3);
+                    });
+                    break;
             }
         }
 
         function autoFillWords(count) {
             const dropZones = Array.from(document.querySelectorAll('.drop-zone'));
             const emptyZones = dropZones.filter(z => z.children.length === 0);
-            
             let filled = 0;
             for (let zone of emptyZones) {
                 if (filled >= count) break;
@@ -659,10 +659,7 @@
                 const wordBank = document.getElementById('word-bank');
                 const words = Array.from(wordBank.children);
                 const matchingWord = words.find(w => w.innerText.trim() === targetText && !w.classList.contains('hidden-word'));
-                if (matchingWord) {
-                    moveWordToZone(matchingWord, zone);
-                    filled++;
-                }
+                if (matchingWord) { moveWordToZone(matchingWord, zone); filled++; }
             }
             Swal.fire({ icon: 'success', title: `จัดเรียงให้ ${filled} คำแล้ว!`, timer: 1500, showConfirmButton: false });
         }
@@ -676,8 +673,9 @@
         }
 
         function addBonusTime(seconds) {
-            gameState.bonusTime += seconds;
-            Swal.fire({ icon: 'success', title: `เพิ่มเวลา ${seconds} วินาที!`, text: 'เวลาที่แสดงจะนับช้าลง', timer: 1500, showConfirmButton: false });
+            // Logic: Reducing elapsed time (Improving score)
+            gameState.bonusTime += seconds; 
+            Swal.fire({ icon: 'success', title: `ลดเวลาให้ ${seconds} วินาที!`, text: 'เวลาเดินถอยหลังเพื่อช่วยคุณ', timer: 1500, showConfirmButton: false });
         }
 
         function shuffleCorrectWords(count) {
@@ -694,13 +692,11 @@
                 wordEl.classList.remove('hidden-word');
                 zone.classList.remove('filled', 'bg-green-100', 'border-green-500');
             });
-            Swal.fire({ icon: 'warning', title: `สลับ ${shuffled.length} คำกลับไปคลังคำ!`, timer: 1500, showConfirmButton: false });
         }
 
         // --- Drag & Drop ---
         let touchDragging = null;
         let touchClone = null;
-
         function dragStart(e) {
             e.dataTransfer.setData('text/plain', e.target.id);
             e.dataTransfer.effectAllowed = 'move';
@@ -822,65 +818,6 @@
             }
         }
 
-        // --- IMPROVED RHYME LINES (Curved & Underneath) ---
-        function drawRhymeLines() {
-            const svg = document.getElementById('svg-lines');
-            if (!svg) return;
-            svg.innerHTML = '';
-            
-            const container = document.getElementById('poem-container');
-            if (!container) return;
-            const containerRect = container.getBoundingClientRect();
-            
-            svg.style.width = container.offsetWidth + 'px';
-            svg.style.height = container.offsetHeight + 'px';
-
-            const el1_5 = document.getElementById('slot-1-5');
-            const el2_3 = document.getElementById('slot-2-3');
-            const el2_6 = document.getElementById('slot-2-6');
-            const el3_5 = document.getElementById('slot-3-5');
-
-            // Draw line function (Curved under)
-            const drawCurve = (el1, el2) => {
-                if (!el1 || !el2) return;
-                const r1 = el1.getBoundingClientRect();
-                const r2 = el2.getBoundingClientRect();
-
-                // Start from bottom-center of Source
-                const x1 = r1.left + r1.width/2 - containerRect.left;
-                const y1 = r1.bottom - containerRect.top;
-
-                // End at bottom-center of Target
-                const x2 = r2.left + r2.width/2 - containerRect.left;
-                const y2 = r2.bottom - containerRect.top;
-
-                // Control points for Bezier Curve (Dip down)
-                const cpY = Math.max(y1, y2) + 40; // Dip 40px below the lowest point
-                
-                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                // M startX startY Q controlX controlY endX endY
-                const d = `M ${x1} ${y1} Q ${(x1+x2)/2} ${cpY} ${x2} ${y2}`;
-                
-                path.setAttribute("d", d);
-                path.setAttribute("stroke", "rgba(233, 30, 99, 0.6)"); // Semi-transparent pink
-                path.setAttribute("stroke-width", "3");
-                path.setAttribute("fill", "none");
-                path.setAttribute("stroke-dasharray", "4,2");
-                svg.appendChild(path);
-
-                // Dots at endpoints
-                [ {x:x1, y:y1}, {x:x2, y:y2} ].forEach(p => {
-                    const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                    c.setAttribute("cx", p.x); c.setAttribute("cy", p.y);
-                    c.setAttribute("r", "3"); c.setAttribute("fill", "#E91E63");
-                    svg.appendChild(c);
-                });
-            };
-
-            drawCurve(el1_5, el2_3);
-            drawCurve(el2_6, el3_5);
-        }
-
         // --- Check Answer ---
         function checkAnswer(showAlert = true) {
             const dropZones = document.querySelectorAll('.drop-zone');
@@ -924,15 +861,14 @@
             let correctCount = checkAnswer(false);
             let total = dropZones.length;
             const accuracyScore = Math.round((correctCount / total) * 80);
-            const timePenalty = Math.min(20, Math.floor(gameState.elapsedSeconds / 15));
+            // Don't punish time if negative elapsed (due to bonuses)
+            const effectiveTime = Math.max(0, gameState.elapsedSeconds);
+            const timePenalty = Math.min(20, Math.floor(effectiveTime / 15));
             const timeBonus = Math.max(0, 20 - timePenalty);
             const finalScore = accuracyScore + timeBonus;
             showResult(finalScore, correctCount, total);
             
-            // Only save if not a guest
-            if (!gameState.isGuest) {
-                saveToSheet(finalScore);
-            }
+            if (!gameState.isGuest) saveToSheet(finalScore);
         }
 
         function showResult(score, correct, total) {
@@ -940,8 +876,10 @@
             document.getElementById('page-result').classList.remove('hidden');
             document.getElementById('result-name').innerText = `ผู้เล่น: ${gameState.player.firstname} ${gameState.player.lastname}`;
             document.getElementById('final-score').innerText = score;
-            const mins = Math.floor(gameState.elapsedSeconds / 60);
-            const secs = gameState.elapsedSeconds % 60;
+            
+            const effectiveTime = Math.max(0, gameState.elapsedSeconds);
+            const mins = Math.floor(effectiveTime / 60);
+            const secs = effectiveTime % 60;
             document.getElementById('final-time').innerText = `เวลาที่ใช้: ${mins} นาที ${secs} วินาที`;
             document.getElementById('correct-answer-display').innerHTML = gameState.currentPoem.displayText.replace(/\n/g, '<br>');
             
@@ -956,8 +894,19 @@
                 suggestEl.innerText = "ทบทวนเรื่อง ครุ-ลหุ ในวรรคที่ 2 และ 4 อีกนิดครับ";
             } else {
                 analysisEl.innerText = "พยายามอีกนิด! ยังเรียงคำไม่ตรงตามสัมผัส";
-                suggestEl.innerText = "สังเกตแผนผังฉันทลักษณ์และเส้นโยงสัมผัสให้ดีครับ";
+                suggestEl.innerText = "สังเกตแผนผังฉันทลักษณ์และสัมผัสให้ดีครับ";
             }
+        }
+
+        function playAgain() {
+            playSound('sound-replay');
+            const overlay = document.getElementById('exit-overlay');
+            overlay.classList.add('active');
+            
+            // Wait 3.5 seconds before reload
+            setTimeout(() => {
+                location.reload();
+            }, 3500);
         }
 
         function saveToSheet(score) {
@@ -966,7 +915,7 @@
                 ...gameState.player,
                 poemId: gameState.currentPoem.id,
                 score: score,
-                time: gameState.elapsedSeconds
+                time: Math.max(0, gameState.elapsedSeconds)
             };
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST', mode: 'no-cors',
