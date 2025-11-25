@@ -16,6 +16,7 @@
     <audio id="sound-replay" preload="auto"><source src="https://nonthaphathr.github.io/uploadimg/replay.mp3" type="audio/mpeg"></audio>
     <audio id="sound-fail" preload="auto"><source src="https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3" type="audio/mpeg"></audio>
     <audio id="sound-shuffle" preload="auto"><source src="https://www.myinstants.com/media/sounds/card-shuffle.mp3" type="audio/mpeg"></audio>
+    <audio id="sound-flip" preload="auto"><source src="https://www.myinstants.com/media/sounds/card-flip.mp3" type="audio/mpeg"></audio>
 
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #fdfcf0; }
@@ -29,12 +30,11 @@
         .bg-gold { background: linear-gradient(135deg, #D4AF37 0%, #C5A028 100%); }
         .text-gold { color: #D4AF37; }
 
-        /* Verse Layout - Fixed Overflow for Labels */
+        /* Verse Layout */
         .verse-row { 
             display: flex; flex-wrap: nowrap; justify-content: center; gap: 6px; 
             margin-bottom: 2rem; overflow-x: auto; 
-            padding-top: 2.5rem; /* Increased padding for labels */
-            padding-bottom: 4px;
+            padding-top: 2.5rem; padding-bottom: 4px;
         }
         .verse-group { flex-shrink: 0; position: relative; }
 
@@ -58,31 +58,20 @@
         .drop-zone.hovered { background-color: #ffe0b2 !important; border-color: #ff9800 !important; transform: scale(1.08); }
         .drop-zone.filled { background-color: #fff8e1; border-style: solid; }
         
-        /* Rhyme Label Above Box - Fixed Positioning */
+        /* Rhyme Label */
         .rhyme-label {
-            position: absolute;
-            bottom: 100%; /* Above the box */
-            left: 50%;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            font-size: 0.6rem;
-            background-color: #FFF3E0;
-            border: 1px solid #FFB74D;
-            padding: 2px 8px;
-            border-radius: 12px;
-            color: #E65100;
-            font-weight: bold;
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+            white-space: nowrap; font-size: 0.6rem;
+            background-color: #FFF3E0; border: 1px solid #FFB74D;
+            padding: 2px 8px; border-radius: 12px;
+            color: #E65100; font-weight: bold;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 20;
-            margin-bottom: 8px; /* Spacing from box */
-            pointer-events: none;
+            z-index: 20; margin-bottom: 8px; pointer-events: none;
         }
-        /* Triangle indicator for label */
         .rhyme-label::after {
             content: ''; position: absolute; top: 100%; left: 50%; margin-left: -4px;
             border-width: 4px; border-style: solid; border-color: #FFB74D transparent transparent transparent;
         }
-
         @media (min-width: 768px) { .rhyme-label { font-size: 0.75rem; padding: 3px 10px; } }
 
         /* Word Card */
@@ -99,63 +88,44 @@
         .fade-in { animation: fadeIn 0.5s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .modal-overlay { background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); }
-        
-        /* Floating Button */
         .floating-aid-btn { position: fixed; right: 10px; top: 50%; transform: translateY(-50%); z-index: 50; transition: all 0.3s ease; }
         .floating-aid-btn:hover { transform: translateY(-50%) scale(1.1); }
-        
-        /* Flash Reveal */
         #flash-reveal-overlay { z-index: 9999; background: rgba(255, 255, 255, 0.98); }
 
         /* CARD SYSTEM STYLES */
         .perspective-1000 { perspective: 1000px; }
-        .card-container {
-            width: 100%; height: 180px; position: relative;
-            transition: transform 0.5s ease-in-out;
+        
+        /* The container for the moving card */
+        .card-wrapper {
+            position: absolute; /* Changed for shuffling */
+            width: 80px; height: 120px;
+            transition: top 0.4s ease-in-out, left 0.4s ease-in-out; 
         }
+        @media (min-width: 768px) { .card-wrapper { width: 120px; height: 160px; } }
+
         .card-inner {
             position: relative; width: 100%; height: 100%; text-align: center;
-            transition: transform 0.6s; transform-style: preserve-3d;
-            cursor: pointer;
+            transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer;
         }
-        /* Class to flip */
         .card-inner.flipped { transform: rotateY(180deg); }
-
         .card-front, .card-back {
             position: absolute; width: 100%; height: 100%;
             -webkit-backface-visibility: hidden; backface-visibility: hidden;
             border-radius: 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        
-        /* Front = Reward Face (Initially visible or revealed) */
-        .card-front { transform: rotateY(180deg); padding: 10px; border: 4px solid #fff; }
-        
-        /* Back = Pattern (Visible when closed) */
+        .card-front { transform: rotateY(180deg); padding: 5px; border: 4px solid #fff; }
         .card-back { 
             background: linear-gradient(45deg, #1f2937 25%, #111827 25%, #111827 50%, #1f2937 50%, #1f2937 75%, #111827 75%, #111827 100%);
-            background-size: 20px 20px;
-            color: #D4AF37; border: 4px solid #D4AF37; 
+            background-size: 20px 20px; color: #D4AF37; border: 4px solid #D4AF37; 
         }
-
-        /* Shuffle Animation */
-        @keyframes shuffleMove {
-            0% { transform: scale(1); }
-            50% { transform: scale(0.8) translateY(0); }
-            100% { transform: scale(1); }
-        }
-        .shuffling { animation: shuffleMove 0.5s ease-in-out; }
 
         /* Timer Bar */
         .timer-bar-container { width: 100%; height: 6px; background: #eee; border-radius: 3px; margin-bottom: 10px; overflow: hidden; }
         .timer-bar { height: 100%; background: #EF4444; width: 100%; transition: width 0.1s linear; }
 
-        /* Exit Animation */
         #exit-overlay { opacity: 0; pointer-events: none; transition: opacity 0.5s; }
         #exit-overlay.active { opacity: 1; pointer-events: auto; }
-
-        /* Logo Animation */
-        .logo-container { position: relative; display: inline-block; }
         .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #D4AF37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); animation: logoFloat 3s ease-in-out infinite; }
         @media (min-width: 768px) { .logo-img { width: 80px; height: 80px; } }
         @keyframes logoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
@@ -170,9 +140,7 @@
         <header class="bg-brown-main text-white p-3 md:p-6 text-center shadow-md relative">
             <div class="absolute top-0 left-0 w-full h-2 bg-gold"></div>
             <div class="flex justify-center mb-3">
-                <div class="logo-container">
-                    <img src="https://nonthaphathr.github.io/uploadimg/logokhampraphan-non.png" alt="Logo" class="logo-img">
-                </div>
+                <img src="https://nonthaphathr.github.io/uploadimg/logokhampraphan-non.png" alt="Logo" class="logo-img relative z-10 bg-white">
             </div>
             <h1 class="text-lg md:text-3xl font-bold mb-1 md:mb-2 text-gold">เกมลากและวางสร้างอินทรวิเชียรฉันท์ ๑๑</h1>
             <p class="text-xs md:text-sm opacity-90">พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง</p>
@@ -256,7 +224,6 @@
             </div>
 
             <div class="p-2 md:p-6 relative flex-grow">
-
                 <h3 class="text-base md:text-xl font-bold text-center text-brown-main mb-1">บทที่ <span id="poem-number">1</span> : จงเรียงคำให้ถูกต้องตามฉันทลักษณ์</h3>
                 <p class="text-center text-gray-500 text-xs mb-3">"คลิกที่คำ" แล้วนำไป "คลิกที่ช่องว่าง" หรือลากไปวาง</p>
 
@@ -281,7 +248,6 @@
         </div>
 
         <div id="page-result" class="hidden p-4 md:p-8 text-center fade-in flex-grow flex flex-col justify-center">
-            
             <h2 class="text-2xl md:text-3xl font-bold text-brown-main mb-2">สรุปผลคะแนน</h2>
             <p id="result-name" class="text-gray-600 mb-4 md:mb-6">คุณ...</p>
 
@@ -298,8 +264,7 @@
 
             <div class="bg-green-50 p-4 rounded-lg border border-green-200 mb-4 md:mb-6 max-w-2xl mx-auto w-full">
                 <h3 class="font-bold text-green-800 mb-2">✅ เฉลยที่ถูกต้อง:</h3>
-                <div id="correct-answer-display" class="text-base md:text-lg text-brown-main font-serif leading-relaxed">
-                </div>
+                <div id="correct-answer-display" class="text-base md:text-lg text-brown-main font-serif leading-relaxed"></div>
             </div>
 
             <button onclick="playAgain()" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 mx-auto border-2 border-gray-300">
@@ -312,24 +277,20 @@
     <div id="quiz-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full border-4 border-purple-400 transform scale-100 transition-transform">
             <h3 class="text-xl font-bold text-purple-700 text-center mb-2">🎁 คำถามชิงสิทธิ์เปิดไพ่!</h3>
-            
             <div class="text-center text-xs text-red-500 mb-1 font-bold">รีบตอบก่อนเวลาหมด!</div>
             <div class="timer-bar-container">
                 <div id="quiz-timer-bar" class="timer-bar"></div>
             </div>
-
             <p class="text-center mb-6 text-lg" id="quiz-question">ข้อใดเป็น <span class="text-red-500 font-bold">"ลหุ"</span> ?</p>
-            
-            <div class="grid grid-cols-2 gap-4" id="quiz-options">
-            </div>
+            <div class="grid grid-cols-2 gap-4" id="quiz-options"></div>
         </div>
     </div>
 
     <div id="card-modal" class="fixed inset-0 z-[100] hidden modal-overlay flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl p-4 md:p-6 max-w-2xl w-full border-4 border-gold">
-            <h3 class="text-xl md:text-2xl font-bold text-brown-main text-center mb-4">🃏 จำตำแหน่งให้ดี!</h3>
+        <div class="bg-white rounded-xl shadow-2xl p-4 md:p-6 max-w-2xl w-full border-4 border-gold relative">
+            <h3 class="text-xl md:text-2xl font-bold text-brown-main text-center mb-8">🃏 จำตำแหน่งให้ดี!</h3>
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="card-grid">
+            <div id="card-play-area" class="relative w-full h-[180px] md:h-[200px] bg-gray-50 rounded-lg mb-4 overflow-hidden border border-gray-200">
                 </div>
 
             <div id="card-status-text" class="text-center mt-4 font-bold text-red-500 animate-pulse">กำลังจำ...</div>
@@ -337,8 +298,7 @@
     </div>
 
     <div id="flash-reveal-overlay" class="fixed inset-0 hidden flex items-center justify-center">
-        <div id="flash-answer-content" class="text-xl md:text-4xl font-bold text-brown-main text-center bg-white p-4 md:p-10 rounded-xl shadow-2xl border-8 border-gold m-4 leading-loose">
-        </div>
+        <div id="flash-answer-content" class="text-xl md:text-4xl font-bold text-brown-main text-center bg-white p-4 md:p-10 rounded-xl shadow-2xl border-8 border-gold m-4 leading-loose"></div>
     </div>
 
     <div id="exit-overlay" class="fixed inset-0 z-[9999] bg-black bg-opacity-90 flex flex-col items-center justify-center text-white">
@@ -399,26 +359,81 @@
             selectedWord: null,
             currentPoem: null,
             allWords: [],
-            quizTriggered: {}, 
+            nextQuizTime: 120, // Next quiz at 120s (2 mins)
             bonusTime: 0,
             isGuest: false,
             quizTimerInterval: null,
-            cardRewards: [] // Temporary storage for current shuffle
+            cardRewards: []
         };
+
+        const STORAGE_KEY = 'kruNonGameSave';
 
         function playSound(soundId) {
             const sound = document.getElementById(soundId);
-            if (sound) {
-                sound.currentTime = 0;
-                sound.play().catch(e => console.log('Audio play failed:', e));
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => console.log('Audio error:', e)); }
+        }
+
+        // --- Load/Save Persistence ---
+        function checkResumeGame() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if(saved) {
+                const data = JSON.parse(saved);
+                // Check if save is valid (not too old, optional)
+                gameState.player = data.player;
+                gameState.isGuest = data.isGuest;
+                gameState.currentPoem = POEMS_DATA.find(p => p.id === data.poemId) || POEMS_DATA[0];
+                gameState.startTime = Date.now() - (data.elapsedSeconds * 1000); // Restore time
+                gameState.bonusTime = data.bonusTime;
+                gameState.nextQuizTime = data.nextQuizTime || 120;
+                
+                initGame(true, data.placedWords); // Resume mode
+                return true;
             }
+            return false;
+        }
+
+        function saveGameState() {
+            // Get all placed words
+            const placedWords = [];
+            document.querySelectorAll('.drop-zone').forEach((zone, index) => {
+                if(zone.children.length > 0) {
+                    placedWords.push({
+                        index: index,
+                        word: zone.children[0].innerText
+                    });
+                }
+            });
+
+            const data = {
+                player: gameState.player,
+                isGuest: gameState.isGuest,
+                poemId: gameState.currentPoem.id,
+                elapsedSeconds: gameState.elapsedSeconds,
+                bonusTime: gameState.bonusTime,
+                nextQuizTime: gameState.nextQuizTime,
+                placedWords: placedWords
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function clearGameState() {
+            localStorage.removeItem(STORAGE_KEY);
         }
 
         // --- Initialization ---
+        // On Load, check if we should show register or game
+        window.onload = () => {
+             if(localStorage.getItem(STORAGE_KEY)) {
+                 checkResumeGame();
+             }
+        };
+
         function startGuestGame() {
             gameState.isGuest = true;
             gameState.player = { prefix: '', level: '-', firstname: 'ผู้เยี่ยมชม', lastname: '(Guest)', number: '-' };
-            initGame();
+            // Clear old save if starting new
+            clearGameState();
+            initNewGame();
         }
 
         function startGame(e) {
@@ -431,21 +446,44 @@
                 lastname: document.getElementById('lastname').value,
                 number: document.getElementById('number').value
             };
-            initGame();
+            clearGameState();
+            initNewGame();
         }
 
-        function initGame() {
+        function initNewGame() {
+            const randomIndex = Math.floor(Math.random() * POEMS_DATA.length);
+            gameState.currentPoem = POEMS_DATA[randomIndex];
+            gameState.startTime = Date.now();
+            initGame(false);
+        }
+
+        function initGame(isResume, placedWords = []) {
             playSound('sound-start');
             document.getElementById('page-register').classList.add('hidden');
             document.getElementById('page-game').classList.remove('hidden');
             document.getElementById('player-name-display').innerText = gameState.isGuest ? 
                 `ผู้เล่น: ผู้เยี่ยมชม (Guest)` : `ผู้เล่น: ${gameState.player.firstname} ${gameState.player.level}`;
 
-            const randomIndex = Math.floor(Math.random() * POEMS_DATA.length);
-            gameState.currentPoem = POEMS_DATA[randomIndex];
             document.getElementById('poem-number').innerText = gameState.currentPoem.id;
 
             setupPoemUI();
+
+            // Restore placed words if resuming
+            if(isResume && placedWords.length > 0) {
+                 const dropZones = document.querySelectorAll('.drop-zone');
+                 const wordBank = document.getElementById('word-bank');
+                 
+                 placedWords.forEach(pw => {
+                     const zone = dropZones[pw.index];
+                     // Find the word card in bank
+                     const words = Array.from(wordBank.children);
+                     const match = words.find(w => w.innerText === pw.word && !w.classList.contains('hidden-word'));
+                     if(match && zone) {
+                         moveWordToZone(match, zone);
+                     }
+                 });
+            }
+
             startTimer();
         }
 
@@ -470,14 +508,14 @@
                     dropZone.dataset.target = syllable.word;
                     dropZone.dataset.type = syllable.type;
                     
-                    // RHYME LABELS - FIXED
+                    // RHYME LABELS - FIXED TEXT
                     if (syllable.rhyme) {
                         const label = document.createElement('div');
                         label.className = 'rhyme-label fade-in';
                         
                         if (syllable.rhyme === 'send1') label.innerText = "ส่ง ➡️ วรรค 2";
                         else if (syllable.rhyme === 'recv1') label.innerText = "⬅️ รับ";
-                        else if (syllable.rhyme === 'send2') label.innerText = "ส่ง ➡️ วรรค 4";
+                        else if (syllable.rhyme === 'send2') label.innerText = "ส่งสัมผัส ➡️ วรรค 3"; // FIX 1
                         else if (syllable.rhyme === 'recv2') label.innerText = "⬅️ รับ";
                         
                         verseGroup.appendChild(label);
@@ -524,7 +562,7 @@
 
         // --- Timer & Events ---
         function startTimer() {
-            gameState.startTime = Date.now();
+            if(gameState.timerInterval) clearInterval(gameState.timerInterval);
             gameState.timerInterval = setInterval(() => {
                 const rawSeconds = Math.floor((Date.now() - gameState.startTime) / 1000);
                 let displaySeconds = Math.max(0, rawSeconds - gameState.bonusTime);
@@ -534,15 +572,22 @@
                 const seconds = (displaySeconds % 60).toString().padStart(2, '0');
                 document.getElementById('timer').innerText = `${minutes}:${seconds}`;
 
-                const minuteMark = Math.floor(rawSeconds / 120);
-                if (rawSeconds > 0 && rawSeconds % 120 === 0 && !gameState.quizTriggered[minuteMark]) {
-                    gameState.quizTriggered[minuteMark] = true;
+                // FIX 4: QUIZ EVERY 2 MINS (Robust check)
+                // Use displaySeconds (real adjusted time) or rawSeconds? Usually rawSeconds for real world time interval.
+                // Using displaySeconds allows "bad" cards (add time) to delay quiz, which is fair.
+                if (displaySeconds >= gameState.nextQuizTime) {
                     showSpecialQuiz();
+                    gameState.nextQuizTime += 120; // Schedule next for 2 mins later
+                    saveGameState();
                 }
+                
+                // Save occasionally
+                if(rawSeconds % 5 === 0) saveGameState();
+
             }, 1000);
         }
 
-        // --- Quiz With 3.5s Timer ---
+        // --- Quiz ---
         function showSpecialQuiz() {
             playSound('sound-quiz');
             const modal = document.getElementById('quiz-modal');
@@ -597,34 +642,40 @@
             }
         }
 
-        // --- CARD SYSTEM REFACTORED (Reveal -> Shuffle -> Pick) ---
+        // --- REAL TIME SHUFFLE SYSTEM ---
         function showCardModal() {
             document.getElementById('card-modal').classList.remove('hidden');
             document.getElementById('card-status-text').innerText = "จำตำแหน่งให้ดี! (3 วินาที)";
             document.getElementById('card-status-text').classList.remove('text-green-500');
             document.getElementById('card-status-text').classList.add('text-red-500');
 
-            const grid = document.getElementById('card-grid');
-            grid.innerHTML = '';
+            const area = document.getElementById('card-play-area');
+            area.innerHTML = '';
             
-            // 1. Prepare Rewards
             const rewards = [
-                { emoji: '🤖', text: 'ช่วยจัด 3 คำ', color: 'bg-gradient-to-br from-blue-400 to-blue-600', action: 'autofill' },
-                { emoji: '⚡', text: 'เปิดเฉลย 1 วิ', color: 'bg-gradient-to-br from-yellow-400 to-yellow-600', action: 'flash' },
-                { emoji: '⏰', text: 'ลดเวลา 30 วิ', color: 'bg-gradient-to-br from-green-400 to-green-600', action: 'addtime' },
-                { emoji: '😈', text: 'สลับคำมั่ว!', color: 'bg-gradient-to-br from-red-600 to-red-800', action: 'shuffle' }
+                { id: 1, emoji: '🤖', text: 'ช่วยจัด 3 คำ', color: 'bg-gradient-to-br from-blue-400 to-blue-600', action: 'autofill' },
+                { id: 2, emoji: '⚡', text: 'เปิดเฉลย 1 วิ', color: 'bg-gradient-to-br from-yellow-400 to-yellow-600', action: 'flash' },
+                { id: 3, emoji: '⏰', text: 'ลดเวลา 30 วิ', color: 'bg-gradient-to-br from-green-400 to-green-600', action: 'addtime' },
+                { id: 4, emoji: '😈', text: 'สลับคำมั่ว!', color: 'bg-gradient-to-br from-red-600 to-red-800', action: 'shuffle' }
             ];
-            
-            // Shuffle initial positions
-            gameState.cardRewards = rewards.sort(() => Math.random() - 0.5);
 
-            // 2. Generate Cards (FACE UP - flipped class added)
-            gameState.cardRewards.forEach((reward, index) => {
+            // Use Fisher-Yates for initial unbiased distribution (FIX 3)
+            fisherYatesShuffle(rewards);
+            gameState.cardRewards = rewards;
+
+            // Calculate positions for absolute placement (Center aligned horizontally in grid)
+            // 4 cards. We can put them at 10%, 35%, 60%, 85% roughly
+            // Or precise px based on container width
+            
+            // Create Card Elements
+            rewards.forEach((reward, index) => {
                 const card = document.createElement('div');
-                card.className = 'card-container';
-                card.id = `card-slot-${index}`;
-                
-                // Add click handler (initially disabled by pointer-events below)
+                card.className = 'card-wrapper absolute top-10'; // Initial Top position
+                // Calculate Left position (4 items spread)
+                // Container is roughly 500-600px. Let's use %
+                card.style.left = (5 + index * 24) + '%';
+                card.dataset.index = index; // Current visual slot index
+
                 card.innerHTML = `
                     <div class="card-inner flipped" id="card-inner-${index}">
                         <div class="card-back rounded-xl flex flex-col items-center justify-center cursor-pointer hover:shadow-xl transition">
@@ -637,62 +688,87 @@
                         </div>
                     </div>
                 `;
-                grid.appendChild(card);
+                
+                // Store reward data on element for easy access
+                card.rewardData = reward;
+                card.onclick = () => selectCard(card);
+                area.appendChild(card);
             });
 
-            // Disable clicks initially
-            grid.style.pointerEvents = 'none';
+            // Disable interaction
+            area.style.pointerEvents = 'none';
 
-            // 3. Sequence: Wait 3s -> Flip Down -> Shuffle -> Enable
+            // Sequence
             setTimeout(() => {
-                // Flip Down
+                // 1. Flip Down
+                playSound('sound-flip');
                 document.querySelectorAll('.card-inner').forEach(c => c.classList.remove('flipped'));
-                
+
                 setTimeout(() => {
-                    // Start Shuffle Animation
+                    // 2. Start Real-time Shuffle
                     playSound('sound-shuffle');
                     document.getElementById('card-status-text').innerText = "กำลังสับไพ่...";
-                    document.querySelectorAll('.card-container').forEach(c => c.classList.add('shuffling'));
-                    
-                    // Logic Shuffle (Swap rewards behind scenes)
-                    setTimeout(() => {
-                        gameState.cardRewards = gameState.cardRewards.sort(() => Math.random() - 0.5);
-                        
-                        // Update DOM content to match new shuffled order (while hidden)
-                        gameState.cardRewards.forEach((reward, index) => {
-                            const frontFace = document.querySelector(`#card-inner-${index} .card-front`);
-                            // Remove old color classes
-                            frontFace.className = `card-front rounded-xl flex flex-col items-center justify-center ${reward.color} text-white border-2 border-white`;
-                            frontFace.innerHTML = `
-                                <div class="text-4xl mb-2 drop-shadow-md">${reward.emoji}</div>
-                                <div class="font-bold text-lg drop-shadow-md text-center leading-tight">${reward.text}</div>
-                            `;
-                            // Attach new click event (via closure index)
-                            const cardInner = document.getElementById(`card-inner-${index}`);
-                            cardInner.onclick = () => selectCard(index);
-                        });
+                    startShuffleAnimation(area);
+                }, 600);
 
-                        document.querySelectorAll('.card-container').forEach(c => c.classList.remove('shuffling'));
-                        
-                        // Enable Picking
-                        grid.style.pointerEvents = 'auto';
-                        document.getElementById('card-status-text').innerText = "เชิญเลือกได้เลย!";
-                        document.getElementById('card-status-text').classList.remove('text-red-500');
-                        document.getElementById('card-status-text').classList.add('text-green-600');
-                    }, 500); // Wait for shuffle animation mid-point
-                }, 600); // Wait for flip down animation
-            }, 3000); // Show time
+            }, 3000);
         }
 
-        function selectCard(index) {
-            const cardInner = document.getElementById(`card-inner-${index}`);
+        // Fisher-Yates Shuffle Algorithm (Fair)
+        function fisherYatesShuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startShuffleAnimation(container) {
+            const cards = Array.from(container.children);
+            let shuffles = 0;
+            const maxShuffles = 8; // Number of swaps
+            const speed = 400; // ms per swap
+
+            const interval = setInterval(() => {
+                // FIX 2: Real-time visual swap
+                // Pick two random indices
+                const idx1 = Math.floor(Math.random() * cards.length);
+                let idx2 = Math.floor(Math.random() * cards.length);
+                while(idx1 === idx2) idx2 = Math.floor(Math.random() * cards.length);
+
+                const card1 = cards[idx1];
+                const card2 = cards[idx2];
+
+                // Swap Left positions visual
+                const pos1 = card1.style.left;
+                const pos2 = card2.style.left;
+
+                card1.style.left = pos2;
+                card2.style.left = pos1;
+
+                // Swap elements in array to keep track
+                [cards[idx1], cards[idx2]] = [cards[idx2], cards[idx1]];
+
+                shuffles++;
+                if (shuffles >= maxShuffles) {
+                    clearInterval(interval);
+                    document.getElementById('card-status-text').innerText = "เชิญเลือกได้เลย!";
+                    document.getElementById('card-status-text').classList.remove('text-red-500');
+                    document.getElementById('card-status-text').classList.add('text-green-600');
+                    container.style.pointerEvents = 'auto';
+                }
+            }, speed);
+        }
+
+        function selectCard(cardWrapper) {
+            const cardInner = cardWrapper.querySelector('.card-inner');
             if (cardInner.classList.contains('flipped')) return;
             
+            playSound('sound-flip');
             cardInner.classList.add('flipped');
-            const reward = gameState.cardRewards[index];
+            const reward = cardWrapper.rewardData;
             
-            // Disable other cards
-            document.querySelectorAll('.card-container').forEach(c => c.style.pointerEvents = 'none');
+            // Disable all
+            document.getElementById('card-play-area').style.pointerEvents = 'none';
 
             setTimeout(() => {
                 document.getElementById('card-modal').classList.add('hidden');
@@ -717,6 +793,7 @@
                     }).then(() => { shuffleCorrectWords(3); });
                     break;
             }
+            saveGameState();
         }
 
         function autoFillWords(count) {
@@ -779,16 +856,9 @@
                 gameState.selectedWord = null;
             }
         }
-        function dragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            const zone = e.target.closest('.drop-zone');
-            if (zone) zone.classList.add('hovered');
-        }
-        function dragLeave(e) {
-            const zone = e.target.closest('.drop-zone');
-            if (zone) zone.classList.remove('hovered');
-        }
+        function dragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; e.target.closest('.drop-zone')?.classList.add('hovered'); }
+        function dragLeave(e) { e.target.closest('.drop-zone')?.classList.remove('hovered'); }
+        
         function drop(e) {
             e.preventDefault();
             const zone = e.target.closest('.drop-zone');
@@ -799,6 +869,7 @@
             if (zone && draggable) {
                 if (zone.children.length > 0) returnToWordBank(zone.children[0]);
                 moveWordToZone(draggable, zone);
+                saveGameState(); // Save on drop
             }
         }
         // Touch Handlers
@@ -807,10 +878,7 @@
             const touch = e.touches[0];
             touchDragging = e.target;
             touchClone = e.target.cloneNode(true);
-            touchClone.style.position = 'fixed';
-            touchClone.style.zIndex = '9999';
-            touchClone.style.pointerEvents = 'none';
-            touchClone.style.opacity = '0.8';
+            touchClone.style.position = 'fixed'; touchClone.style.zIndex = '9999'; touchClone.style.pointerEvents = 'none'; touchClone.style.opacity = '0.8';
             document.body.appendChild(touchClone);
             updateTouchClonePosition(touch);
             e.target.classList.add('hidden-word');
@@ -822,10 +890,7 @@
             updateTouchClonePosition(touch);
             const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
             document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('hovered'));
-            if (elementUnder) {
-                const zone = elementUnder.closest('.drop-zone');
-                if (zone) zone.classList.add('hovered');
-            }
+            elementUnder?.closest('.drop-zone')?.classList.add('hovered');
             e.preventDefault();
         }
         function touchEnd(e) {
@@ -835,42 +900,29 @@
             const touch = e.changedTouches[0];
             const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
             document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('hovered'));
-            if (elementUnder) {
-                const zone = elementUnder.closest('.drop-zone');
-                if (zone) {
-                    if (zone.children.length > 0) returnToWordBank(zone.children[0]);
-                    moveWordToZone(touchDragging, zone);
-                } else touchDragging.classList.remove('hidden-word');
+            const zone = elementUnder?.closest('.drop-zone');
+            if (zone) {
+                if (zone.children.length > 0) returnToWordBank(zone.children[0]);
+                moveWordToZone(touchDragging, zone);
+                saveGameState(); // Save on touch drop
             } else touchDragging.classList.remove('hidden-word');
             touchDragging = null;
         }
         function updateTouchClonePosition(touch) {
-            if (touchClone) {
-                touchClone.style.left = (touch.clientX - 30) + 'px';
-                touchClone.style.top = (touch.clientY - 20) + 'px';
-            }
+            if (touchClone) { touchClone.style.left = (touch.clientX - 30) + 'px'; touchClone.style.top = (touch.clientY - 20) + 'px'; }
         }
         function selectWord(el) {
-            if (gameState.selectedWord === el) {
-                el.classList.remove('selected');
-                gameState.selectedWord = null;
-                return;
-            }
+            if (gameState.selectedWord === el) { el.classList.remove('selected'); gameState.selectedWord = null; return; }
             if (gameState.selectedWord) gameState.selectedWord.classList.remove('selected');
-            if (el.parentElement && el.parentElement.classList.contains('drop-zone')) {
-                returnToWordBank(el);
-                gameState.selectedWord = null;
-                return;
-            }
-            gameState.selectedWord = el;
-            el.classList.add('selected');
+            if (el.parentElement?.classList.contains('drop-zone')) { returnToWordBank(el); gameState.selectedWord = null; saveGameState(); return; }
+            gameState.selectedWord = el; el.classList.add('selected');
         }
         function placeSelectedWord(zone) {
             if (!gameState.selectedWord) return;
             if (zone.children.length > 0) returnToWordBank(zone.children[0]);
             moveWordToZone(gameState.selectedWord, zone);
-            gameState.selectedWord.classList.remove('selected');
-            gameState.selectedWord = null;
+            gameState.selectedWord.classList.remove('selected'); gameState.selectedWord = null;
+            saveGameState(); // Save on click place
         }
         function moveWordToZone(item, zone) {
             item.classList.remove('hidden-word');
@@ -881,10 +933,7 @@
             const wordBank = document.getElementById('word-bank');
             item.classList.remove('hidden-word');
             wordBank.appendChild(item);
-            const parentZone = item.parentElement;
-            if (parentZone && parentZone.classList.contains('drop-zone')) {
-                parentZone.classList.remove('filled', 'bg-green-100', 'border-green-500', 'bg-red-100', 'border-red-500');
-            }
+            item.parentElement?.classList.remove('filled', 'bg-green-100', 'border-green-500', 'bg-red-100', 'border-red-500');
         }
 
         // --- Check Answer ---
@@ -896,12 +945,8 @@
                 if (zone.children.length > 0) {
                     const placedWord = zone.children[0].innerText.trim();
                     const targetWord = zone.dataset.target.trim();
-                    if (placedWord === targetWord) {
-                        correctCount++;
-                        zone.classList.add('bg-green-100', 'border-green-500');
-                    } else {
-                        zone.classList.add('bg-red-100', 'border-red-500');
-                    }
+                    if (placedWord === targetWord) { correctCount++; zone.classList.add('bg-green-100', 'border-green-500'); }
+                    else { zone.classList.add('bg-red-100', 'border-red-500'); }
                 }
             });
             if (showAlert) {
@@ -936,6 +981,7 @@
             const finalScore = accuracyScore + timeBonus;
             showResult(finalScore, correctCount, total);
             
+            clearGameState(); // Clear save on finish
             if (!gameState.isGuest) saveToSheet(finalScore);
         }
 
