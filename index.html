@@ -143,7 +143,7 @@
             <p class="text-xs md:text-sm opacity-90">พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง</p>
         </header>
 
-        <div id="page-register" class="p-4 md:p-8 fade-in flex-grow flex flex-col items-center justify-center relative">
+        <div id="page-register" class="p-4 md:p-8 fade-in flex-grow flex flex-col items-center justify-center">
             <div class="w-full max-w-md z-10">
                 <h2 class="text-2xl font-bold text-brown-main mb-6 text-center border-b-2 border-gold pb-2 inline-block w-full">ลงทะเบียน</h2>
                 <form id="regis-form" onsubmit="startGame(event)" class="space-y-4">
@@ -197,21 +197,23 @@
                         👤 ทดลองเล่น (ไม่ต้องลงทะเบียน)
                     </button>
                 </form>
-            </div>
 
-            <div id="visitor-badge" class="mt-8 md:absolute md:bottom-0 md:left-0 flex items-center gap-2 bg-yellow-50 p-2 md:p-3 rounded-full border border-gold opacity-90">
-                <div class="bg-gradient-to-br from-yellow-400 to-yellow-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-inner">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
+                <div class="mt-8 flex justify-center">
+                    <div id="visitor-badge" class="bg-yellow-50/80 backdrop-blur px-4 py-2 rounded-full border border-yellow-400 flex items-center gap-3 shadow-sm transform transition-all duration-500 translate-y-4 opacity-0">
+                        <div class="bg-gradient-to-br from-yellow-400 to-yellow-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-inner">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </div>
+                        <div class="flex flex-col text-left">
+                            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wide">เข้าชมแล้ว</span>
+                            <span id="visit-count" class="text-sm font-bold text-brown-main font-mono leading-none">...</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex flex-col pr-2">
-                    <span class="text-[9px] text-gray-500 font-bold uppercase">จำนวนผู้เข้าชม</span>
-                    <span id="visit-count" class="text-sm font-bold text-brown-main font-mono leading-none">กำลังโหลด...</span>
                 </div>
-            </div>
-            </div>
+        </div>
 
         <div id="page-game" class="hidden relative flex-grow flex flex-col">
             <div class="flex flex-wrap justify-between items-center bg-yellow-50 p-2 md:p-4 border-b border-gray-200 gap-2">
@@ -439,20 +441,38 @@
         // On Load, check if we should show register or game
         window.onload = () => {
              // 📊 VISITOR COUNTER START
-             // Using a very specific namespace to ensure it works and doesn't conflict
-             const NAMESPACE = 'th-krunon-indravichian-counter'; 
-             const KEY = 'visit_v1';
+             // แก้ไข Namespace ให้เฉพาะเจาะจงมากขึ้นและไม่ซ้ำ เพื่อรีเซ็ตค่า N/A
+             const NAMESPACE = 'nonthaphathr-indravichian-game-v1'; 
+             const KEY = 'visits';
              const countEl = document.getElementById('visit-count');
+             const badge = document.getElementById('visitor-badge');
              
              fetch(`https://api.counterapi.com/v1/${NAMESPACE}/${KEY}/up`)
                  .then(response => response.json())
                  .then(data => {
-                     countEl.innerText = data.count.toLocaleString();
+                     // Animation ตัวเลข
+                     const start = 0;
+                     const end = data.count;
+                     const duration = 2000;
+                     let startTimestamp = null;
+                     const step = (timestamp) => {
+                        if (!startTimestamp) startTimestamp = timestamp;
+                        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                        countEl.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+                        if (progress < 1) {
+                            window.requestAnimationFrame(step);
+                        }
+                     };
+                     window.requestAnimationFrame(step);
+                     
+                     // Show badge smoothly
+                     badge.classList.remove('translate-y-4', 'opacity-0');
                  })
                  .catch(err => {
                      console.error("Counter Error:", err);
-                     // If fetch fails (AdBlock etc), show basic text
-                     countEl.innerText = "N/A";
+                     // กรณีโหลดไม่ได้ (เช่น AdBlock)
+                     countEl.innerText = "-";
+                     badge.classList.remove('translate-y-4', 'opacity-0');
                  });
              // 📊 VISITOR COUNTER END
 
