@@ -325,7 +325,7 @@
 
     <script>
         // --- Configuration ---
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3ek50qmc39njmYK0HRiWq_GXpclneLZdhW5FR-iLbdjWuieHbVrMO0BHnq78d8KQHNQ/exec';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6jkDTPwUEMmAwjOvDvOdIg5L9e94a8Kl9BB5DT7K6LnZSiRJE-1nHtD9WjuBUK6HYfA/exec';
 
         // --- POEM DATA ---
         const POEMS_DATA = [
@@ -1084,6 +1084,7 @@ fetch('https://api.counterapi.dev/v1/nonthaphathr-indravichian-game/visits/up')
 
         function saveToSheet(score) {
             const data = {
+                game: 'game4',
                 timestamp: new Date().toISOString(),
                 ...gameState.player,
                 poemId: gameState.currentPoem.id,
