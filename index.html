@@ -126,6 +126,149 @@
         .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #D4AF37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); animation: logoFloat 3s ease-in-out infinite; }
         @media (min-width: 768px) { .logo-img { width: 80px; height: 80px; } }
         @keyframes logoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+        /* ============ HOW-TO-PLAY TUTORIAL (วิธีเล่น) ============ */
+        #tutorial-overlay {
+            position: fixed; inset: 0; z-index: 10000;
+            background: rgba(45, 28, 10, 0.78); backdrop-filter: blur(6px);
+            display: none; align-items: center; justify-content: center; padding: 10px;
+        }
+        #tutorial-overlay.show { display: flex; }
+        .tut-box {
+            background: #fffdf5; width: 100%; max-width: 760px; max-height: 95vh;
+            border-radius: 20px; border: 4px solid #D4AF37;
+            box-shadow: 0 24px 60px rgba(0,0,0,.45);
+            display: flex; flex-direction: column; overflow: hidden;
+            animation: tutPop .35s cubic-bezier(.2,.9,.3,1.3);
+        }
+        @keyframes tutPop { from { opacity: 0; transform: translateY(28px) scale(.94); } to { opacity: 1; transform: none; } }
+        .tut-head { background: #5D4037; color: #fff; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .tut-head h2 { font-size: .95rem; font-weight: 700; color: #D4AF37; line-height: 1.2; }
+        .tut-head .tut-sub { font-size: .65rem; opacity: .85; }
+        .tut-close { background: rgba(255,255,255,.15); border-radius: 999px; width: 30px; height: 30px; font-size: 1rem; line-height: 1; color: #fff; flex-shrink: 0; }
+        .tut-close:hover { background: rgba(255,255,255,.3); }
+        .tut-body { padding: 12px 14px 6px; overflow-y: auto; flex-grow: 1; }
+        .tut-slide { display: none; }
+        .tut-slide.active { display: block; }
+        .tut-title { font-size: 1rem; font-weight: 700; color: #5D4037; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .tut-title .tut-num { background: #D4AF37; color: #fff; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; }
+        .tut-stage { background: #fff; border: 2px dashed #e6d9b4; border-radius: 14px; padding: 4px; }
+        .tut-stage svg { display: block; width: 100%; height: auto; }
+        .tut-desc { font-size: .82rem; color: #4b3b2b; margin-top: 8px; line-height: 1.55; }
+        .tut-desc b { color: #8B4513; }
+        .tut-note { margin-top: 6px; font-size: .74rem; background: #FFF8E1; border-left: 4px solid #D4AF37; padding: 6px 10px; border-radius: 6px; color: #6d5533; }
+        .tut-foot { padding: 9px 14px; border-top: 1px solid #f0e8d5; background: #fffaf0; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .tut-dots { display: flex; gap: 5px; }
+        .tut-dot { width: 9px; height: 9px; border-radius: 50%; background: #e4d9bd; cursor: pointer; transition: all .3s; }
+        .tut-dot.on { background: #D4AF37; width: 24px; border-radius: 6px; }
+        .tut-nav { display: flex; gap: 8px; align-items: center; }
+        .tut-btn { font-size: .8rem; font-weight: 700; padding: 7px 14px; border-radius: 999px; transition: all .2s; white-space: nowrap; }
+        .tut-skip, .tut-btn { white-space: nowrap; }
+        .tut-btn-ghost { color: #8d7b62; }
+        .tut-btn-ghost:hover { background: #f2ead6; }
+        .tut-btn-main { background: linear-gradient(135deg,#D4AF37,#C5A028); color: #4a3212; box-shadow: 0 4px 10px rgba(212,175,55,.45); }
+        .tut-btn-main:hover { transform: translateY(-2px); }
+        .tut-btn-go { background: #16a34a; color: #fff; box-shadow: 0 4px 12px rgba(22,163,74,.4); }
+        .tut-btn-go:hover { transform: translateY(-2px); }
+        .tut-skip { font-size: .72rem; color: #a08e73; padding: 4px 8px; border-radius: 8px; }
+        .tut-skip:hover { background: #f2ead6; color: #6d5533; }
+        @media (max-width: 430px) {
+            .tut-btn { font-size: .72rem; padding: 7px 10px; }
+            .tut-skip { font-size: .64rem; padding: 4px 5px; }
+            .tut-dot { width: 7px; height: 7px; }
+            .tut-dots { gap: 4px; }
+            .tut-foot { padding: 8px 8px; gap: 4px; }
+        }
+        @media (min-width: 768px) {
+            .tut-head h2 { font-size: 1.15rem; }
+            .tut-title { font-size: 1.15rem; }
+            .tut-desc { font-size: .95rem; }
+            .tut-note { font-size: .85rem; }
+            .tut-btn { font-size: .9rem; padding: 9px 20px; }
+        }
+
+        /* --- shared SVG text --- */
+        .tut-stage text { font-family: 'Sarabun', sans-serif; }
+        .tut-stage g, .tut-stage rect, .tut-stage circle, .tut-stage text { transform-box: fill-box; transform-origin: center; }
+        .svg-cap { font-size: 11px; fill: #8d7b62; font-weight: 700; }
+        .svg-lbl { font-size: 10px; fill: #7a6a55; }
+
+        /* --- slide 1 --- */
+        .tut-slide.active .t1-row { opacity: 0; animation: t1in .5s ease forwards; }
+        @keyframes t1in { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: none; } }
+        .tut-slide.active .t1-word { opacity: 0; animation: t1drop .5s ease forwards; }
+        @keyframes t1drop { from { opacity: 0; transform: translateY(16px) scale(.7); } to { opacity: 1; transform: none; } }
+        .tut-slide.active .t1-brace { opacity: 0; animation: t1in .5s ease 2.4s forwards; }
+
+        /* --- slide 2 --- */
+        .tut-slide.active .t2-float { animation: t2float 2s ease-in-out infinite; }
+        @keyframes t2float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+        .tut-slide.active .t2-heavy { animation: t2heavy 2s ease-in-out infinite; }
+        @keyframes t2heavy { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+        .tut-slide.active .t2-card { animation: t2move 5s ease-in-out infinite; }
+        @keyframes t2move {
+            0%, 8%   { transform: translate(0,0); }
+            26%, 62% { transform: translate(0,-62px); }
+            72%,100% { transform: translate(0,0); }
+        }
+        .tut-slide.active .t2-ok { opacity: 0; animation: t2pop 5s ease-in-out infinite; }
+        @keyframes t2pop { 0%,28% { opacity: 0; transform: scale(.4); } 36%,60% { opacity: 1; transform: scale(1); } 68%,100% { opacity: 0; transform: scale(.4); } }
+        .tut-slide.active .t2-glow { opacity: 0; animation: t2glow 5s ease-in-out infinite; }
+        @keyframes t2glow { 0%,26% { opacity: 0; } 34%,62% { opacity: 1; } 70%,100% { opacity: 0; } }
+
+        /* --- slide 3 --- */
+        .tut-slide.active .t3-drag { animation: t3drag 4.5s ease-in-out infinite; }
+        @keyframes t3drag {
+            0%, 10%  { transform: translate(0,0); }
+            45%, 72% { transform: translate(96px,-58px); }
+            80%,100% { transform: translate(0,0); }
+        }
+        .tut-slide.active .t3-hand { animation: t3hand 4.5s ease-in-out infinite; }
+        @keyframes t3hand {
+            0%, 10%  { transform: translate(0,0) scale(1); }
+            45%, 72% { transform: translate(96px,-58px) scale(1); }
+            76%      { transform: translate(96px,-58px) scale(.85); }
+            80%,100% { transform: translate(0,0) scale(1); }
+        }
+        .tut-slide.active .t3-tap1 { animation: t3tap 4.5s ease-in-out infinite; }
+        @keyframes t3tap { 0%,14% { opacity: 1; transform: scale(1); } 26% { opacity: .2; transform: scale(2.2); } 27%,100% { opacity: 0; transform: scale(1); } }
+        .tut-slide.active .t3-tap2 { opacity: 0; animation: t3tap2 4.5s ease-in-out infinite; }
+        @keyframes t3tap2 { 0%,44% { opacity: 0; transform: scale(1); } 46% { opacity: 1; transform: scale(1); } 58% { opacity: .2; transform: scale(2.2); } 59%,100% { opacity: 0; transform: scale(1); } }
+        .tut-slide.active .t3-jump { opacity: 0; animation: t3jump 4.5s ease-in-out infinite; }
+        @keyframes t3jump { 0%,58% { opacity: 0; transform: translateY(10px) scale(.6); } 66%,88% { opacity: 1; transform: none; } 96%,100% { opacity: 0; } }
+        .tut-slide.active .t3-src { animation: t3src 4.5s ease-in-out infinite; }
+        @keyframes t3src { 0%,58% { opacity: 1; } 62%,92% { opacity: .15; } 98%,100% { opacity: 1; } }
+
+        /* --- slide 4 --- */
+        .tut-slide.active .t4-path { stroke-dasharray: 100; stroke-dashoffset: 100; animation: t4draw 4s ease-in-out infinite; }
+        .tut-slide.active .t4-path2 { stroke-dasharray: 100; stroke-dashoffset: 100; animation: t4draw 4s ease-in-out 1.1s infinite; }
+        @keyframes t4draw { 0%,10% { stroke-dashoffset: 100; } 40%,80% { stroke-dashoffset: 0; } 92%,100% { stroke-dashoffset: 100; } }
+        .tut-slide.active .t4-pill { animation: t4pulse 2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+        @keyframes t4pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.09); } }
+        .tut-slide.active .t4-hi { animation: t4hi 4s ease-in-out infinite; }
+        @keyframes t4hi { 0%,20% { fill: #fff8e1; } 45%,85% { fill: #ffe0b2; } 95%,100% { fill: #fff8e1; } }
+
+        /* --- slide 5 --- */
+        .tut-slide.active .t5-hand { animation: t5spin 3s linear infinite; transform-box: fill-box; transform-origin: bottom center; }
+        @keyframes t5spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+        .tut-slide.active .t5-quiz { animation: t5shake 3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+        @keyframes t5shake { 0%,70%,100% { transform: rotate(0); } 76% { transform: rotate(-2.5deg); } 84% { transform: rotate(2.5deg); } 92% { transform: rotate(0); } }
+        .tut-slide.active .t5-flip { animation: t5flip 4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+        @keyframes t5flip { 0%,30% { transform: scaleX(1); } 45% { transform: scaleX(.05); } 46%,90% { transform: scaleX(0); } 100% { transform: scaleX(1); } }
+        .tut-slide.active .t5-face { opacity: 0; animation: t5face 4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+        @keyframes t5face { 0%,45% { opacity: 0; transform: scaleX(.05); } 60%,90% { opacity: 1; transform: scaleX(1); } 97%,100% { opacity: 0; transform: scaleX(.05); } }
+        .tut-slide.active .t5-star { animation: t5star 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+        @keyframes t5star { 0%,100% { opacity: .35; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.15); } }
+
+        /* --- slide 6 --- */
+        .tut-slide.active .t6-bar1 { animation: t6fill1 3.2s ease-out infinite; }
+        @keyframes t6fill1 { 0% { width: 0; } 45%,100% { width: 216px; } }
+        .tut-slide.active .t6-bar2 { animation: t6fill2 3.2s ease-out infinite; }
+        @keyframes t6fill2 { 0%,45% { width: 0; } 75%,100% { width: 54px; } }
+        .tut-slide.active .t6-num { opacity: 0; animation: t6num .6s ease 2.2s forwards; }
+        @keyframes t6num { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        .tut-slide.active .t6-btn { animation: t6btn 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+        @keyframes t6btn { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-2 md:p-4 relative overflow-x-hidden">
@@ -196,6 +339,10 @@
                     <button type="button" onclick="startGuestGame()" class="w-full bg-gray-100 text-gray-600 font-semibold py-2 rounded-xl border border-gray-300 hover:bg-gray-200 transition duration-200 text-sm">
                         👤 ทดลองเล่น (ไม่ต้องลงทะเบียน)
                     </button>
+
+                    <button type="button" onclick="openTutorial(1)" class="w-full bg-white text-brown-main font-bold py-2.5 rounded-xl border-2 border-gold hover:bg-yellow-50 transition duration-200 text-sm shadow-sm">
+                        📖 ดูวิธีเล่น (คำอธิบายภาพเคลื่อนไหว)
+                    </button>
                 </form>
 
                 <div class="mt-8 flex justify-center">
@@ -220,6 +367,9 @@
                 <div class="flex items-center gap-2">
                     <button onclick="quitGame()" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow transition flex items-center gap-1">
                         ❌ <span class="hidden md:inline">ออกจากเกม</span>
+                    </button>
+                    <button onclick="openTutorial(1)" class="bg-white text-brown-main border border-gold text-xs px-3 py-1.5 rounded-lg font-bold shadow hover:bg-yellow-50 transition flex items-center gap-1">
+                        📖 <span class="hidden md:inline">วิธีเล่น</span>
                     </button>
                     <div class="font-bold text-brown-main text-xs md:text-base border-l border-gray-300 pl-2">
                         <span id="player-name-display">ผู้เล่น: ...</span>
@@ -318,6 +468,262 @@
         <div id="flash-answer-content" class="text-xl md:text-4xl font-bold text-brown-main text-center bg-white p-4 md:p-10 rounded-xl shadow-2xl border-8 border-gold m-4 leading-loose"></div>
     </div>
 
+
+    <!-- ============ HOW-TO-PLAY TUTORIAL ============ -->
+    <div id="tutorial-overlay" role="dialog" aria-modal="true" aria-label="วิธีเล่นเกม">
+        <div class="tut-box">
+            <div class="tut-head">
+                <div>
+                    <h2>📖 วิธีเล่นเกมลากและวางสร้างอินทรวิเชียรฉันท์ 11</h2>
+                    <div class="tut-sub">ดูภาพเคลื่อนไหวประกอบทีละขั้น ก่อนเริ่มเล่นจริง</div>
+                </div>
+                <button type="button" class="tut-close" onclick="closeTutorial()" aria-label="ปิด">✕</button>
+            </div>
+            <div class="tut-body" id="tut-body">
+                <div class="tut-slide" data-step="1">
+                    <div class="tut-title"><span class="tut-num">1</span> เกมนี้ให้ทำอะไร</div>
+                    <div class="tut-stage">
+                        <svg viewBox="0 0 440 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="เกมนี้ให้ทำอะไร">
+            <text x="220" y="16" text-anchor="middle" class="svg-cap">1 บท = 4 วรรค = 22 ช่อง (บาทละ 11 คำ)</text>
+            <g class="t1-row" style="animation-delay:0.00s">
+              <text x="8" y="52" class="svg-lbl">วรรค 1</text>
+              <rect x="58" y="34" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="92" y="34" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="126" y="34" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="160" y="34" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="194" y="34" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+              <text x="232" y="52" class="svg-lbl" fill="#D4AF37">5 คำ</text>
+              <g class="t1-word" style="animation-delay:1.00s"><rect x="61" y="37" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="72.0" y="51" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:1.12s"><rect x="95" y="37" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="106.0" y="51" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:1.24s"><rect x="129" y="37" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="140.0" y="51" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:1.36s"><rect x="163" y="37" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="174.0" y="51" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:1.48s"><rect x="197" y="37" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="208.0" y="51" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            </g>
+            <g class="t1-row" style="animation-delay:0.25s">
+              <text x="8" y="94" class="svg-lbl">วรรค 2</text>
+              <rect x="58" y="76" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="92" y="76" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="126" y="76" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="160" y="76" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="194" y="76" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="228" y="76" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+              <text x="266" y="94" class="svg-lbl" fill="#D4AF37">6 คำ</text>
+              <g class="t1-word" style="animation-delay:1.35s"><rect x="61" y="79" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="72.0" y="93" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:1.47s"><rect x="95" y="79" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="106.0" y="93" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:1.59s"><rect x="129" y="79" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="140.0" y="93" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:1.71s"><rect x="163" y="79" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="174.0" y="93" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:1.83s"><rect x="197" y="79" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="208.0" y="93" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:1.95s"><rect x="231" y="79" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="242.0" y="93" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            </g>
+            <g class="t1-row" style="animation-delay:0.50s">
+              <text x="8" y="136" class="svg-lbl">วรรค 3</text>
+              <rect x="58" y="118" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="92" y="118" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="126" y="118" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="160" y="118" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="194" y="118" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+              <text x="232" y="136" class="svg-lbl" fill="#D4AF37">5 คำ</text>
+              <g class="t1-word" style="animation-delay:1.70s"><rect x="61" y="121" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="72.0" y="135" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:1.82s"><rect x="95" y="121" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="106.0" y="135" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:1.94s"><rect x="129" y="121" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="140.0" y="135" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:2.06s"><rect x="163" y="121" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="174.0" y="135" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:2.18s"><rect x="197" y="121" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="208.0" y="135" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            </g>
+            <g class="t1-row" style="animation-delay:0.75s">
+              <text x="8" y="178" class="svg-lbl">วรรค 4</text>
+              <rect x="58" y="160" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="92" y="160" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="126" y="160" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="160" y="160" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="194" y="160" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+            <rect x="228" y="160" width="28" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+              <text x="266" y="178" class="svg-lbl" fill="#D4AF37">6 คำ</text>
+              <g class="t1-word" style="animation-delay:2.05s"><rect x="61" y="163" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="72.0" y="177" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:2.17s"><rect x="95" y="163" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="106.0" y="177" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:2.29s"><rect x="129" y="163" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="140.0" y="177" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:2.41s"><rect x="163" y="163" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="174.0" y="177" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:2.53s"><rect x="197" y="163" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="208.0" y="177" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            <g class="t1-word" style="animation-delay:2.65s"><rect x="231" y="163" width="22" height="20" rx="4" fill="#fff8e1" stroke="#D4AF37"/><text x="242.0" y="177" text-anchor="middle" font-size="10" fill="#8B4513">คำ</text></g>
+            </g>
+            <g class="t1-brace">
+              <path d="M312,34 h8 v68 h-8" fill="none" stroke="#D4AF37" stroke-width="2"/>
+              <text x="326" y="72" class="svg-lbl" fill="#8B4513">บาทที่ 1 (5+6=11 คำ)</text>
+              <path d="M312,118 h8 v68 h-8" fill="none" stroke="#D4AF37" stroke-width="2"/>
+              <text x="326" y="156" class="svg-lbl" fill="#8B4513">บาทที่ 2 (5+6=11 คำ)</text>
+            </g>
+                        </svg>
+                    </div>
+                    <p class="tut-desc">เป้าหมายคือ <b>เรียงคำให้ครบทุกช่อง</b> จนได้บทประพันธ์ <b>อินทรวิเชียรฉันท์ 11</b> ที่ถูกต้อง หนึ่งบทมี 4 วรรค (วรรคหน้า 5 คำ + วรรคหลัง 6 คำ รวมบาทละ 11 คำ) คำทั้งหมดถูกสับไว้ใน "คลังคำศัพท์" ด้านล่างจอ</p>
+                    <div class="tut-note">💡 ระบบจะสุ่มบทประพันธ์ให้ 1 บทจากทั้งหมด 3 บท ทุกครั้งที่เริ่มเล่นใหม่</div>
+                </div>
+                <div class="tut-slide" data-step="2">
+                    <div class="tut-title"><span class="tut-num">2</span> รู้จัก ครุ และ ลหุ ก่อน</div>
+                    <div class="tut-stage">
+                        <svg viewBox="0 0 440 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="รู้จัก ครุ และ ลหุ ก่อน">
+            <rect x="14" y="8" width="196" height="30" rx="15" fill="#e8f0fe" stroke="#3b82f6"/>
+            <text x="112" y="27" text-anchor="middle" font-size="11" fill="#1d4ed8" font-weight="bold">ครุ = เสียงหนัก (คำยาว / มีตัวสะกด)</text>
+            <rect x="230" y="8" width="196" height="30" rx="15" fill="#fee2e2" stroke="#ef4444"/>
+            <text x="328" y="27" text-anchor="middle" font-size="11" fill="#b91c1c" font-weight="bold">ลหุ = เสียงเบา (คำสั้น ไม่มีตัวสะกด)</text>
+            <text x="220" y="60" text-anchor="middle" class="svg-cap">ใต้ทุกช่องมีป้ายกำกับว่าต้องวางคำชนิดใด</text>
+            <rect x="90" y="78" width="38" height="32" rx="7" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+            <text x="109" y="124" text-anchor="middle" font-size="11" font-weight="bold" fill="#1d4ed8">ครุ</text>
+            <rect x="136" y="78" width="38" height="32" rx="7" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+            <text x="155" y="124" text-anchor="middle" font-size="11" font-weight="bold" fill="#1d4ed8">ครุ</text>
+            <rect x="182" y="78" width="38" height="32" rx="7" fill="#fef2f2" stroke="#fca5a5" stroke-width="2"/>
+            <text x="201" y="124" text-anchor="middle" font-size="11" font-weight="bold" fill="#dc2626">ลหุ</text>
+            <rect x="228" y="78" width="38" height="32" rx="7" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+            <text x="247" y="124" text-anchor="middle" font-size="11" font-weight="bold" fill="#1d4ed8">ครุ</text>
+            <rect x="274" y="78" width="38" height="32" rx="7" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+            <text x="293" y="124" text-anchor="middle" font-size="11" font-weight="bold" fill="#1d4ed8">ครุ</text>
+            <rect class="t2-glow" x="177" y="73" width="48" height="42" rx="10" fill="none" stroke="#22c55e" stroke-width="3"/>
+            <g class="t2-ok"><circle cx="228" cy="80" r="11" fill="#22c55e"/><path d="M222,80 l4,5 l8,-10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+            <g class="t2-card"><rect x="182" y="140" width="38" height="30" rx="7" fill="#fff" stroke="#ef4444" stroke-width="2"/><text x="201" y="161" text-anchor="middle" font-size="15" font-weight="bold" fill="#b91c1c">ระ</text></g>
+            <g class="t2-float"><rect x="290" y="138" width="42" height="32" rx="7" fill="#fff" stroke="#fca5a5" stroke-width="2"/><text x="311" y="160" text-anchor="middle" font-size="14" fill="#b91c1c">มิ</text><text x="311" y="186" text-anchor="middle" font-size="10" fill="#dc2626">เบา ลอยขึ้น</text></g>
+            <g class="t2-heavy"><rect x="352" y="138" width="46" height="32" rx="7" fill="#fff" stroke="#93c5fd" stroke-width="2"/><text x="375" y="160" text-anchor="middle" font-size="14" fill="#1d4ed8">นับ</text><text x="375" y="186" text-anchor="middle" font-size="10" fill="#1d4ed8">หนัก กดลง</text></g>
+            <text x="112" y="160" text-anchor="middle" font-size="11" fill="#8d7b62">วางคำ "ลหุ" ลงช่องที่กำกับว่า ลหุ</text>
+            <text x="112" y="178" text-anchor="middle" font-size="11" fill="#8d7b62">จึงจะถูกต้องตามฉันทลักษณ์</text>
+                        </svg>
+                    </div>
+                    <p class="tut-desc">ใต้ช่องว่างทุกช่องจะมี<b>ป้ายบอกชนิดของคำ</b> คือ <b class="text-blue-700">ครุ</b> (เสียงหนัก) หรือ <b class="text-red-600">ลหุ</b> (เสียงเบา) ต้องเลือกคำให้ตรงชนิด และตรงตำแหน่งตามฉันทลักษณ์</p>
+                    <div class="tut-note">💡 ตำแหน่ง ลหุ ของอินทรวิเชียรฉันท์ 11 คือ คำที่ 3 ของวรรคหน้า และคำที่ 1-2, 4 ของวรรคหลัง</div>
+                </div>
+                <div class="tut-slide" data-step="3">
+                    <div class="tut-title"><span class="tut-num">3</span> วิธีวางคำ ทำได้ 2 แบบ</div>
+                    <div class="tut-stage">
+                        <svg viewBox="0 0 440 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="วิธีวางคำ ทำได้ 2 แบบ">
+            <line x1="220" y1="10" x2="220" y2="200" stroke="#eee5cd" stroke-width="2" stroke-dasharray="5 5"/>
+            <text x="110" y="20" text-anchor="middle" class="svg-cap">วิธีที่ 1 : ลากไปวาง</text>
+            <rect x="126" y="44" width="44" height="28" rx="7" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4 3"/>
+            <text x="148" y="86" text-anchor="middle" font-size="10" fill="#dc2626">ลหุ</text>
+            <rect x="16" y="94" width="188" height="46" rx="10" fill="#fef9c3" stroke="#fde047"/>
+            <text x="110" y="152" text-anchor="middle" class="svg-lbl">คลังคำศัพท์</text>
+            <g class="t3-drag"><rect x="30" y="102" width="44" height="28" rx="7" fill="#fff" stroke="#D4AF37" stroke-width="2"/><text x="52" y="122" text-anchor="middle" font-size="13" font-weight="bold" fill="#5D4037">ระ</text></g>
+            <g class="t3-hand"><path d="M74,124 l0,20 l5,-5 l4,9 l5,-2 l-4,-9 l7,0 z" fill="#5D4037" stroke="#fff" stroke-width="1.5"/></g>
+            <text x="330" y="20" text-anchor="middle" class="svg-cap">วิธีที่ 2 : คลิก 2 ครั้ง</text>
+            <rect x="346" y="44" width="44" height="28" rx="7" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4 3"/>
+            <text x="368" y="86" text-anchor="middle" font-size="10" fill="#dc2626">ลหุ</text>
+            <g class="t3-jump"><rect x="346" y="44" width="44" height="28" rx="7" fill="#fff8e1" stroke="#22c55e" stroke-width="2"/><text x="368" y="64" text-anchor="middle" font-size="13" font-weight="bold" fill="#5D4037">ระ</text></g>
+            <circle class="t3-tap2" cx="368" cy="58" r="14" fill="none" stroke="#f59e0b" stroke-width="3"/>
+            <rect x="236" y="94" width="188" height="46" rx="10" fill="#fef9c3" stroke="#fde047"/>
+            <text x="330" y="152" text-anchor="middle" class="svg-lbl">คลังคำศัพท์</text>
+            <g class="t3-src"><rect x="250" y="102" width="44" height="28" rx="7" fill="#fff" stroke="#D4AF37" stroke-width="2"/><text x="272" y="122" text-anchor="middle" font-size="13" font-weight="bold" fill="#5D4037">ระ</text></g>
+            <circle class="t3-tap1" cx="272" cy="116" r="14" fill="none" stroke="#f59e0b" stroke-width="3"/>
+            <text x="330" y="176" text-anchor="middle" font-size="10" fill="#8d7b62">1) แตะที่คำ  →  2) แตะที่ช่องว่าง</text>
+            <text x="220" y="198" text-anchor="middle" font-size="10.5" fill="#8B4513">แตะคำที่วางไปแล้วอีกครั้ง = ส่งคำกลับคลังคำ</text>
+                        </svg>
+                    </div>
+                    <p class="tut-desc">แบบที่ 1 <b>ลากคำ</b> จากคลังคำไปวางในช่อง (ใช้ได้ทั้งเมาส์และนิ้วบนมือถือ) แบบที่ 2 <b>แตะที่คำ 1 ครั้ง แล้วแตะที่ช่องว่าง</b> คำจะกระโดดไปเอง</p>
+                    <div class="tut-note">💡 วางผิดช่องไม่เป็นไร แตะคำนั้นซ้ำอีกครั้ง คำจะเด้งกลับคลังคำทันที</div>
+                </div>
+                <div class="tut-slide" data-step="4">
+                    <div class="tut-title"><span class="tut-num">4</span> อ่านป้ายสัมผัสให้เป็น</div>
+                    <div class="tut-stage">
+                        <svg viewBox="0 0 440 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="อ่านป้ายสัมผัสให้เป็น">
+            <text x="220" y="18" text-anchor="middle" class="svg-cap">ป้ายสีส้ม = จุดสัมผัสบังคับ (คำที่ต้องคล้องจองกัน)</text>
+            <text x="10" y="73" class="svg-lbl">วรรค 1</text>
+            <rect x="90" y="54" width="38" height="28" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect x="136" y="54" width="38" height="28" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect x="182" y="54" width="38" height="28" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect x="228" y="54" width="38" height="28" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect class="t4-hi" x="274" y="54" width="38" height="28" rx="6" fill="#fff8e1" stroke="#f59e0b" stroke-width="2"/>
+            <text x="10" y="141" class="svg-lbl">วรรค 2</text>
+            <rect x="90" y="122" width="38" height="28" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect x="136" y="122" width="38" height="28" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect class="t4-hi" x="182" y="122" width="38" height="28" rx="6" fill="#fff8e1" stroke="#f59e0b" stroke-width="2"/>
+            <rect x="228" y="122" width="38" height="28" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect x="274" y="122" width="38" height="28" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect class="t4-hi" x="320" y="122" width="38" height="28" rx="6" fill="#fff8e1" stroke="#f59e0b" stroke-width="2"/>
+            <text x="10" y="209" class="svg-lbl">วรรค 3</text>
+            <rect x="90" y="190" width="38" height="28" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect x="136" y="190" width="38" height="28" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect x="182" y="190" width="38" height="28" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect x="228" y="190" width="38" height="28" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+            <rect class="t4-hi" x="274" y="190" width="38" height="28" rx="6" fill="#fff8e1" stroke="#f59e0b" stroke-width="2"/>
+            <g class="t4-pill"><rect x="264" y="32" width="58" height="17" rx="8.5" fill="#FFF3E0" stroke="#FFB74D"/><text x="293.0" y="44.5" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#E65100">ส่งสัมผัส</text></g>
+            <g class="t4-pill"><rect x="310" y="100" width="58" height="17" rx="8.5" fill="#FFF3E0" stroke="#FFB74D"/><text x="339.0" y="112.5" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#E65100">ส่งสัมผัส</text></g>
+            <g class="t4-pill"><rect x="138" y="99" width="58" height="17" rx="8.5" fill="#FFF3E0" stroke="#FFB74D"/><text x="167.0" y="111.5" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#E65100">รับสัมผัส</text></g>
+            <g class="t4-pill"><rect x="230" y="167" width="58" height="17" rx="8.5" fill="#FFF3E0" stroke="#FFB74D"/><text x="259.0" y="179.5" text-anchor="middle" font-size="9.5" font-weight="bold" fill="#E65100">รับสัมผัส</text></g>
+            <path d="M180,116 l10,6" stroke="#FFB74D" stroke-width="2"/>
+            <path d="M272,184 l10,6" stroke="#FFB74D" stroke-width="2"/>
+            <defs><marker id="tut-arrow" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#f97316"/></marker></defs>
+            <path class="t4-path" pathLength="100" d="M293,86 C293,106 201,100 201,114" fill="none" stroke="#f97316" stroke-width="2.5" marker-end="url(#tut-arrow)"/>
+            <path class="t4-path2" pathLength="100" d="M339,154 C339,174 293,168 293,182" fill="none" stroke="#f97316" stroke-width="2.5" marker-end="url(#tut-arrow)"/>
+                        </svg>
+                    </div>
+                    <p class="tut-desc">ป้ายสีส้มเหนือช่องคือ<b>จุดสัมผัสบังคับ</b> คำท้ายวรรค 1 ต้องสัมผัสกับคำที่ 3 ของวรรค 2 และคำท้ายวรรค 2 ต้องสัมผัสกับคำท้ายวรรค 3</p>
+                    <div class="tut-note">💡 ถ้าเลือกคำที่คล้องจองกันได้ตรงจุดเหล่านี้ ที่เหลือจะเรียงง่ายขึ้นมาก</div>
+                </div>
+                <div class="tut-slide" data-step="5">
+                    <div class="tut-title"><span class="tut-num">5</span> ภารกิจพิเศษ ระหว่างเล่น</div>
+                    <div class="tut-stage">
+                        <svg viewBox="0 0 468 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ภารกิจพิเศษ ระหว่างเล่น">
+            <circle cx="56" cy="86" r="34" fill="#fff" stroke="#5D4037" stroke-width="3"/>
+            <circle cx="56" cy="86" r="3" fill="#5D4037"/>
+            <circle cx="56" cy="60" r="2" fill="#a8a29e"/>
+            <circle cx="82" cy="86" r="2" fill="#a8a29e"/>
+            <circle cx="56" cy="112" r="2" fill="#a8a29e"/>
+            <circle cx="30" cy="86" r="2" fill="#a8a29e"/>
+            <rect class="t5-hand" x="54.5" y="62" width="3" height="26" rx="1.5" fill="#dc2626"/>
+            <text x="56" y="140" text-anchor="middle" font-size="11" font-weight="bold" fill="#5D4037">ทุก ๆ 2 นาที</text>
+            <text x="56" y="158" text-anchor="middle" font-size="10" fill="#8d7b62">จะมีคำถามโผล่ขึ้นมา</text>
+            <g class="t5-quiz"><rect x="106" y="40" width="150" height="112" rx="12" fill="#fff" stroke="#a855f7" stroke-width="2.5"/><rect x="118" y="52" width="126" height="6" rx="3" fill="#e9d5ff"/><rect x="118" y="52" width="70" height="6" rx="3" fill="#a855f7"/><text x="181" y="78" text-anchor="middle" font-size="12" font-weight="bold" fill="#5D4037">ข้อใดเป็น "ลหุ" ?</text><rect x="118" y="90" width="56" height="30" rx="7" fill="#f1f5f9" stroke="#cbd5e1"/><text x="146" y="110" text-anchor="middle" font-size="13" fill="#334155">นับ</text><rect x="188" y="90" width="56" height="30" rx="7" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/><text x="216" y="110" text-anchor="middle" font-size="13" fill="#15803d" font-weight="bold">ระ</text><text x="181" y="140" text-anchor="middle" font-size="10" fill="#9333ea">ตอบให้ทันใน 3.5 วินาที!</text></g>
+            <text x="181" y="170" text-anchor="middle" font-size="10.5" fill="#8B4513">ตอบถูก = ได้สิทธิ์เปิดไพ่ 1 ใบ</text>
+            <g class="t5-flip"><rect x="278" y="46" width="64" height="92" rx="9" fill="#fffbeb" stroke="#D4AF37" stroke-width="2.5"/><text x="310" y="100" text-anchor="middle" font-size="30">🃏</text></g>
+            <g class="t5-face"><rect x="278" y="46" width="64" height="92" rx="9" fill="#7c3aed" stroke="#fff" stroke-width="2.5"/><text x="310" y="96" text-anchor="middle" font-size="26">🤖</text><text x="310" y="120" text-anchor="middle" font-size="9" fill="#fff" font-weight="bold">ช่วยจัด 3 คำ</text></g>
+            <text class="t5-star" x="310" y="36" text-anchor="middle" font-size="14">✨</text>
+            <text x="310" y="158" text-anchor="middle" font-size="10" fill="#8d7b62">เสี่ยงดวงเปิดไพ่</text>
+            <text x="356" y="60" font-size="13">🤖</text><text x="374" y="60" font-size="9.5" fill="#5D4037">ช่วยจัด 3 คำ</text>
+            <text x="356" y="84" font-size="13">⚡</text><text x="374" y="84" font-size="9.5" fill="#5D4037">เปิดเฉลย 1 วิ</text>
+            <text x="356" y="108" font-size="13">⏰</text><text x="374" y="108" font-size="9.5" fill="#5D4037">ลดเวลา 30 วิ</text>
+            <text x="356" y="132" font-size="13">😈</text><text x="374" y="132" font-size="9.5" fill="#5D4037">สลับคำมั่ว! (ร้าย)</text>
+                        </svg>
+                    </div>
+                    <p class="tut-desc">ทุก ๆ 2 นาที จะมีคำถาม <b>ครุ-ลหุ</b> เด้งขึ้นมา ให้ตอบภายใน 3.5 วินาที ตอบถูกจะได้ปุ่ม <b>🃏 เสี่ยงดวงเปิดไพ่</b> ที่ขอบจอ เปิดไพ่แล้วได้ตัวช่วย 1 อย่าง</p>
+                    <div class="tut-note">💡 ระวังไพ่ 😈 "สลับคำมั่ว" เพราะจะสลับคำที่วางถูกแล้วให้มั่วขึ้น ถือเป็นการเสี่ยงดวง</div>
+                </div>
+                <div class="tut-slide" data-step="6">
+                    <div class="tut-title"><span class="tut-num">6</span> ตรวจคำตอบและคิดคะแนน</div>
+                    <div class="tut-stage">
+                        <svg viewBox="0 0 440 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ตรวจคำตอบและคิดคะแนน">
+            <text x="220" y="20" text-anchor="middle" class="svg-cap">คะแนนเต็ม 100 คะแนน</text>
+            <rect x="90" y="44" width="270" height="26" rx="13" fill="#f1f5f9" stroke="#e2e8f0"/>
+            <clipPath id="tut-clip"><rect x="90" y="44" width="270" height="26" rx="13"/></clipPath>
+            <g clip-path="url(#tut-clip)">
+              <rect class="t6-bar1" x="90" y="44" height="26" width="0" fill="#D4AF37"/>
+              <rect class="t6-bar2" x="306" y="44" height="26" width="0" fill="#22c55e"/>
+            </g>
+            <text class="t6-num" x="198" y="62" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">80</text>
+            <text class="t6-num" x="333" y="62" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">20</text>
+            <rect x="70" y="84" width="150" height="24" rx="12" fill="#fffbeb" stroke="#D4AF37"/><text x="145" y="100" text-anchor="middle" font-size="10.5" fill="#8B4513">ความถูกต้องของคำ 80 คะแนน</text>
+            <rect x="232" y="84" width="150" height="24" rx="12" fill="#f0fdf4" stroke="#22c55e"/><text x="307" y="100" text-anchor="middle" font-size="10.5" fill="#15803d">ทำเร็ว ได้โบนัสเวลา 20 คะแนน</text>
+            <rect x="36" y="126" width="172" height="34" rx="17" fill="#3b82f6"/><text x="122" y="148" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">🔍 ตรวจดูความถูกต้อง</text>
+            <g class="t6-btn"><rect x="232" y="126" width="172" height="34" rx="17" fill="#16a34a"/><text x="318" y="148" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">🚀 ส่งคำตอบ &amp; จบเกม</text></g>
+            <text x="122" y="178" text-anchor="middle" font-size="9.5" fill="#8d7b62">ช่องเขียว = ถูก / ช่องแดง = ผิด</text>
+            <text x="318" y="178" text-anchor="middle" font-size="9.5" fill="#8d7b62">กดเมื่อมั่นใจแล้ว (จบเกมทันที)</text>
+                        </svg>
+                    </div>
+                    <p class="tut-desc">กด <b>🔍 ตรวจดูความถูกต้อง</b> ได้ตลอดเวลา ช่องที่ถูกจะเป็นสีเขียว ผิดเป็นสีแดง เมื่อมั่นใจแล้วจึงกด <b>🚀 ส่งคำตอบ</b> เพื่อจบเกมและบันทึกคะแนน</p>
+                    <div class="tut-note">💡 คะแนน = ความถูกต้อง 80 คะแนน + โบนัสเวลา 20 คะแนน (ใช้เวลาทุก 15 วินาที หักโบนัส 1 คะแนน) ปิดเบราว์เซอร์กลางคัน ระบบจะจำความคืบหน้าไว้ให้</div>
+                </div>
+            </div>
+            <div class="tut-foot">
+                <button type="button" class="tut-skip" onclick="closeTutorial()">ข้ามคำอธิบาย</button>
+                <div class="tut-dots">
+                    <div class="tut-dot" data-dot="1" onclick="tutGo(1)" title="ขั้นที่ 1"></div>
+                    <div class="tut-dot" data-dot="2" onclick="tutGo(2)" title="ขั้นที่ 2"></div>
+                    <div class="tut-dot" data-dot="3" onclick="tutGo(3)" title="ขั้นที่ 3"></div>
+                    <div class="tut-dot" data-dot="4" onclick="tutGo(4)" title="ขั้นที่ 4"></div>
+                    <div class="tut-dot" data-dot="5" onclick="tutGo(5)" title="ขั้นที่ 5"></div>
+                    <div class="tut-dot" data-dot="6" onclick="tutGo(6)" title="ขั้นที่ 6"></div>
+                </div>
+                <div class="tut-nav">
+                    <button type="button" id="tut-prev" class="tut-btn tut-btn-ghost" onclick="tutPrev()">‹ ย้อนกลับ</button>
+                    <button type="button" id="tut-next" class="tut-btn tut-btn-main" onclick="tutNext()">ถัดไป ›</button>
+                    <button type="button" id="tut-start" class="tut-btn tut-btn-go hidden" onclick="closeTutorial()">เข้าใจแล้ว เริ่มเล่น! 🎮</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="exit-overlay" class="fixed inset-0 z-[9999] bg-black bg-opacity-90 flex flex-col items-center justify-center text-white">
         <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-gold mb-4"></div>
         <p class="text-xl font-bold">กำลังเตรียมเริ่มเกมใหม่...</p>
@@ -477,6 +883,9 @@ fetch('https://api.counterapi.dev/v1/nonthaphathr-indravichian-game/visits/up')
 
              if(localStorage.getItem(STORAGE_KEY)) {
                  checkResumeGame();
+             } else {
+                 // แสดงคำอธิบายวิธีเล่นทันทีที่เข้าเว็บ (เมื่อไม่มีเกมค้างอยู่)
+                 openTutorial(1);
              }
         };
 
@@ -1097,6 +1506,73 @@ fetch('https://api.counterapi.dev/v1/nonthaphathr-indravichian-game/visits/up')
                 body: JSON.stringify(data)
             }).then(() => console.log("Score saved")).catch(err => console.error("Error saving:", err));
         }
+
+        // ============ HOW-TO-PLAY TUTORIAL (วิธีเล่น) ============
+        const TUT_TOTAL = 6;
+        let tutStep = 1;
+
+        function openTutorial(step) {
+            tutStep = step || 1;
+            document.getElementById('tutorial-overlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            tutRender();
+        }
+
+        function closeTutorial() {
+            document.getElementById('tutorial-overlay').classList.remove('show');
+            document.body.style.overflow = '';
+            const reg = document.getElementById('page-register');
+            const fn = document.getElementById('firstname');
+            if (fn && reg && !reg.classList.contains('hidden')) { try { fn.focus(); } catch(e) {} }
+        }
+
+        function tutGo(n) {
+            tutStep = Math.min(TUT_TOTAL, Math.max(1, n));
+            tutRender();
+        }
+        function tutNext() { if (tutStep >= TUT_TOTAL) { closeTutorial(); return; } tutGo(tutStep + 1); }
+        function tutPrev() { tutGo(tutStep - 1); }
+
+        function tutRender() {
+            document.querySelectorAll('.tut-slide').forEach(s => {
+                s.classList.toggle('active', parseInt(s.dataset.step, 10) === tutStep);
+            });
+            document.querySelectorAll('.tut-dot').forEach(d => {
+                d.classList.toggle('on', parseInt(d.dataset.dot, 10) === tutStep);
+            });
+            const last = (tutStep === TUT_TOTAL);
+            document.getElementById('tut-prev').style.visibility = (tutStep === 1) ? 'hidden' : 'visible';
+            document.getElementById('tut-next').style.display = last ? 'none' : 'inline-block';
+            document.getElementById('tut-start').style.display = last ? 'inline-block' : 'none';
+            document.getElementById('tut-body').scrollTop = 0;
+        }
+
+        // keyboard: ← → เปลี่ยนขั้น, Esc ปิด
+        document.addEventListener('keydown', (e) => {
+            const ov = document.getElementById('tutorial-overlay');
+            if (!ov || !ov.classList.contains('show')) return;
+            if (e.key === 'Escape') closeTutorial();
+            else if (e.key === 'ArrowRight') tutNext();
+            else if (e.key === 'ArrowLeft') tutPrev();
+        });
+
+        // swipe บนมือถือ
+        (function () {
+            let sx = 0, sy = 0;
+            document.addEventListener('touchstart', (e) => {
+                const ov = document.getElementById('tutorial-overlay');
+                if (!ov || !ov.classList.contains('show')) return;
+                sx = e.changedTouches[0].clientX; sy = e.changedTouches[0].clientY;
+            }, { passive: true });
+            document.addEventListener('touchend', (e) => {
+                const ov = document.getElementById('tutorial-overlay');
+                if (!ov || !ov.classList.contains('show') || !sx) return;
+                const dx = e.changedTouches[0].clientX - sx;
+                const dy = e.changedTouches[0].clientY - sy;
+                if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) { dx < 0 ? tutNext() : tutPrev(); }
+                sx = 0;
+            }, { passive: true });
+        })();
     </script>
 </body>
 </html>
